@@ -8,24 +8,41 @@ import {
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-function generateTimeline(targetCountry: string) {
+function generateTimeline(targetCountry: string, profile: any) {
   const isUS = targetCountry?.includes('United States');
   const isUK = targetCountry?.includes('United Kingdom');
   const isCanada = targetCountry?.includes('Canada');
 
-  const milestones = [
-    { month: 0, title: 'Research Phase', items: ['Shortlist 8-10 universities', 'Compare programs and costs using ROI Calculator', 'Join community forums and webinars'], icon: BookOpen, phase: 'discovery' },
-    { month: 1, title: 'Test Preparation', items: ['Register for GRE/GMAT/IELTS', `Target: GRE 320+ or IELTS 7.5+`, 'Take practice tests weekly'], icon: FileText, phase: 'preparation' },
-    { month: 2, title: 'Test Dates', items: ['Take GRE/GMAT exam', 'Take IELTS/TOEFL exam', 'Order score reports sent to universities'], icon: CheckCircle2, phase: 'preparation' },
+  let milestones = [];
+
+  if (profile.stage === 'explorer') {
+    milestones.push({ month: 0, title: 'Research Phase & Shortlisting', items: ['Shortlist 8-10 universities', 'Compare programs and costs using ROI Calculator', 'Join community forums and webinars'], icon: BookOpen, phase: 'discovery' });
+  }
+
+  // If user hasn't successfully taken a test yet, add prep blocks
+  if (!profile.greScore && !profile.toeflScore && !profile.ieltsScore) {
+    milestones.push({ month: 1, title: 'Test Preparation', items: ['Register for GRE/GMAT/IELTS', `Target: GRE 320+ or IELTS 7.5+`, 'Take practice tests weekly'], icon: FileText, phase: 'preparation' });
+    milestones.push({ month: 2, title: 'Test Dates', items: ['Take GRE/GMAT exam', 'Take IELTS/TOEFL exam', 'Order score reports sent to universities'], icon: CheckCircle2, phase: 'preparation' });
+  } else {
+    milestones.push({ month: 1, title: 'Test Scores Confirmed', items: ['Ensure official scores are sent to targeted universities', 'Verify test score validities'], icon: CheckCircle2, phase: 'preparation' });
+  }
+
+  // Everyone gets remaining tasks, incremented appropriately
+  milestones = [...milestones,
     { month: 3, title: 'Documents Prep', items: ['Request recommendation letters (2-3)', 'Write Statement of Purpose (SOP) drafts', 'Get transcripts notarized/attested'], icon: FileText, phase: 'documentation' },
     { month: 4, title: 'Applications Open', items: ['Finalize university shortlist to 5-6', 'Submit applications (early rounds)', isUS ? 'I-20 form prep for US' : isUK ? 'Prepare CAS application for UK' : 'Check specific country requirements'], icon: GraduationCap, phase: 'application' },
-    { month: 5, title: 'Application Deadlines', items: ['Submit remaining applications', 'Follow up on recommendation letters', 'Track application status online'], icon: Clock, phase: 'application' },
-    { month: 6, title: 'Admission Results', items: ['Admission offers start arriving', 'Compare offers (scholarships, aid)', 'Accept best offer and pay deposit'], icon: CheckCircle2, phase: 'decision' },
-    { month: 7, title: 'Loan Application', items: ['Apply for education loan via Margdarshak', 'Generate Investment Case for parents', 'Upload admit letter → auto-fill application'], icon: FileText, phase: 'loan' },
-    { month: 8, title: 'Visa Application', items: [isUS ? 'Book US Embassy visa slot (DS-160)' : isUK ? 'Apply for UK Student Visa' : isCanada ? 'Apply for Canada Study Permit' : 'Apply for student visa', 'Prepare financial documents for visa', 'Attend visa interview'], icon: Plane, phase: 'visa' },
-    { month: 9, title: 'Pre-Departure', items: ['Book flights', 'Arrange accommodation', 'Complete forex + travel insurance', 'Attend pre-departure orientation'], icon: Plane, phase: 'departure' },
+    { month: 5, title: 'Application Deadlines', items: ['Submit remaining applications', 'Follow up on recommendation letters', 'Track application status online'], icon: Clock, phase: 'application' }
   ];
-  return milestones;
+
+  if (profile.stage !== 'explorer') {
+    milestones.push({ month: 6, title: 'Admission Results', items: ['Admission offers start arriving', 'Compare offers (scholarships, aid)', 'Accept best offer and pay deposit'], icon: CheckCircle2, phase: 'decision' });
+    milestones.push({ month: 7, title: 'Loan Application', items: ['Apply for education loan via Margdarshak', 'Generate Investment Case for parents', 'Upload admit letter → auto-fill application'], icon: FileText, phase: 'loan' });
+    milestones.push({ month: 8, title: 'Visa Application', items: [isUS ? 'Book US Embassy visa slot (DS-160)' : isUK ? 'Apply for UK Student Visa' : isCanada ? 'Apply for Canada Study Permit' : 'Apply for student visa', 'Prepare financial documents for visa', 'Attend visa interview'], icon: Plane, phase: 'visa' });
+    milestones.push({ month: 9, title: 'Pre-Departure', items: ['Book flights', 'Arrange accommodation', 'Complete forex + travel insurance', 'Attend pre-departure orientation'], icon: Plane, phase: 'departure' });
+  }
+
+  // Resync months to be sequential after filtering
+  return milestones.map((m, index) => ({ ...m, month: index }));
 }
 
 const phaseColors: Record<string, string> = {
@@ -41,12 +58,16 @@ const phaseColors: Record<string, string> = {
 
 export default function TimelinePage() {
   const { profile } = useAppStore();
-  const timeline = generateTimeline(profile.targetCountry || 'United States');
+  const timeline = generateTimeline(profile.targetCountry || 'United States', profile);
   const currentMonth = new Date().getMonth();
 
   // WhatsApp Nudging Simulation State
+  const initialWaText = (!profile.greScore && !profile.toeflScore) ?
+    `Hi ${profile.name.split(' ')[0] || 'Aryan'}! I'm your Margdarshak AI guide. Based on your timeline, you have a GRE test target in 30 days. Have you started mock tests?` :
+    `Hi ${profile.name.split(' ')[0] || 'Aryan'}! I'm your Margdarshak AI guide. I see you already have your test scores. Let's focus on securing recommendation letters this month!`;
+
   const [waMessages, setWaMessages] = useState([
-    { role: 'bot', text: `Hi ${profile.name.split(' ')[0] || 'Aryan'}! I'm your Margdarshak AI guide. Based on your timeline, you have a GRE test target in 30 days. Have you started mock tests?` }
+    { role: 'bot', text: initialWaText }
   ]);
   const [waInput, setWaInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);

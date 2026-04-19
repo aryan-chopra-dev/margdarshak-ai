@@ -50,25 +50,25 @@ export default function AdmissionPredictorPage() {
             <div>
               <label className="input-label">GRE Score (260-340)</label>
               <input className="input-field" type="number" min="260" max="340" value={form.greScore}
-                onChange={e => setForm(f => ({ ...f, greScore: parseInt(e.target.value) || 260 }))} />
+                onChange={e => setForm(f => ({ ...f, greScore: Math.min(340, Math.max(260, parseInt(e.target.value) || 260)) }))} />
               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Dataset avg: {datasetStats.greScore.mean}</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div>
                 <label className="input-label">TOEFL (0-120)</label>
                 <input className="input-field" type="number" min="0" max="120" value={form.toeflScore}
-                  onChange={e => setForm(f => ({ ...f, toeflScore: parseInt(e.target.value) || 0 }))} />
+                  onChange={e => setForm(f => ({ ...f, toeflScore: Math.min(120, Math.max(0, parseInt(e.target.value) || 0)) }))} />
               </div>
               <div>
                 <label className="input-label">IELTS (0-9) alt.</label>
                 <input className="input-field" type="number" min="0" max="9" step="0.5" value={form.ieltsScore}
-                  onChange={e => setForm(f => ({ ...f, ieltsScore: parseFloat(e.target.value) || 0 }))} />
+                  onChange={e => setForm(f => ({ ...f, ieltsScore: Math.min(9, Math.max(0, parseFloat(e.target.value) || 0)) }))} />
               </div>
             </div>
             <div>
               <label className="input-label">CGPA (out of 10)</label>
               <input className="input-field" type="number" min="0" max="10" step="0.1" value={form.cgpa}
-                onChange={e => setForm(f => ({ ...f, cgpa: parseFloat(e.target.value) || 0 }))} />
+                onChange={e => setForm(f => ({ ...f, cgpa: Math.min(10, Math.max(0, parseFloat(e.target.value) || 0)) }))} />
               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Dataset avg: {datasetStats.cgpa.mean}</span>
             </div>
             <div>
@@ -84,19 +84,19 @@ export default function AdmissionPredictorPage() {
               <div>
                 <label className="input-label">SOP Strength (1-5)</label>
                 <input className="input-field" type="number" min="1" max="5" value={form.sopStrength}
-                  onChange={e => setForm(f => ({ ...f, sopStrength: parseInt(e.target.value) || 1 }))} />
+                  onChange={e => setForm(f => ({ ...f, sopStrength: Math.min(5, Math.max(1, parseInt(e.target.value) || 1)) }))} />
               </div>
               <div>
                 <label className="input-label">LOR Strength (1-5)</label>
                 <input className="input-field" type="number" min="1" max="5" value={form.lorStrength}
-                  onChange={e => setForm(f => ({ ...f, lorStrength: parseInt(e.target.value) || 1 }))} />
+                  onChange={e => setForm(f => ({ ...f, lorStrength: Math.min(5, Math.max(1, parseInt(e.target.value) || 1)) }))} />
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div>
                 <label className="input-label">Work Experience (yrs)</label>
                 <input className="input-field" type="number" min="0" max="10" value={form.workExperienceYears}
-                  onChange={e => setForm(f => ({ ...f, workExperienceYears: parseInt(e.target.value) || 0 }))} />
+                  onChange={e => setForm(f => ({ ...f, workExperienceYears: Math.min(20, Math.max(0, parseInt(e.target.value) || 0)) }))} />
               </div>
               <label style={{
                 display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',

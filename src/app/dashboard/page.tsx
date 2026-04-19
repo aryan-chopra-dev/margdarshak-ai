@@ -56,7 +56,7 @@ export default function DashboardPage() {
               <Flame size={14} /> {streakDays}-day streak
             </span>
           )}
-          <Link href="/onboarding" className="btn-secondary" style={{ fontSize: 13, padding: '6px 14px' }}>
+          <Link href="/profile" className="btn-secondary" style={{ fontSize: 13, padding: '6px 14px' }}>
             <Edit3 size={14} /> Edit Profile
           </Link>
         </div>

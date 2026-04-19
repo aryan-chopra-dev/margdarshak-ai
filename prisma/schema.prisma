@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profile {
+  id                      String   @id @default(uuid())
+  email                   String   @unique
+  name                    String
+  phone                   String?
+  stage                   String   @default("explorer")
+  targetCountry           String?
+  targetField             String?
+  degree                  String   @default("masters")
+  gpa                     Float    @default(0)
+  greScore                Int      @default(0)
+  toeflScore              Int      @default(0)
+  ieltsScore              Float    @default(0)
+  workExperience          Int      @default(0)
+  budget                  Int      @default(0)
+  hasResearch             Boolean  @default(false)
+  shortlistedUniversities String[] // PostgreSQL supports string arrays
+  parentName              String?
+  parentPhone             String?
+  parentIncome            Int      @default(0)
+  parentOccupation        String?
+  kycVerified             Boolean  @default(false)
+  docsUploaded            String[]
+  
+  lrsScore                Int      @default(300)
+  intentScore             Int      @default(0)
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
