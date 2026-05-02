@@ -1,17 +1,41 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-import { Pool } from 'pg';
-import { PrismaPg } from '@prisma/adapter-pg';
-
-const connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/postgres";
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
-
-export async function GET(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { email, ...updates } = await req.json();
+
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    }
+
+    // Convert arrays to JSON strings if they are passed as arrays
+    if (Array.isArray(updates.shortlistedUniversities)) {
+      updates.shortlistedUniversities = JSON.stringify(updates.shortlistedUniversities);
+    }
+    if (Array.isArray(updates.docsUploaded)) {
+      updates.docsUploaded = JSON.stringify(updates.docsUploaded);
+    }
+
+    const profile = await prisma.profile.update({
+      where: { email },
+      data: updates,
+    });
+
+    return NextResponse.json({
+      status: 'success',
+      profile,
+    });
+
+  } catch (error) {
+    console.error('Profile Update Error:', error);
+    return NextResponse.json({ status: 'error', message: 'Failed to update profile' }, { status: 500 });
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
     const email = searchParams.get('email');
 
     if (!email) {
@@ -26,35 +50,20 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
 
-    return NextResponse.json(profile);
-  } catch (error) {
-    console.error('Error fetching profile:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
-}
+    // Parse JSON strings back to arrays
+    const parsedProfile = {
+      ...profile,
+      shortlistedUniversities: JSON.parse(profile.shortlistedUniversities || '[]'),
+      docsUploaded: JSON.parse(profile.docsUploaded || '[]'),
+    };
 
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { email, ...updates } = body;
-
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
-    }
-
-    // Upsert means it will create if it doesn't exist, or update if it does.
-    const profile = await prisma.profile.upsert({
-      where: { email },
-      update: updates,
-      create: {
-        email,
-        ...updates
-      },
+    return NextResponse.json({
+      status: 'success',
+      profile: parsedProfile,
     });
 
-    return NextResponse.json(profile);
   } catch (error) {
-    console.error('Error saving profile:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Profile Fetch Error:', error);
+    return NextResponse.json({ status: 'error', message: 'Failed to fetch profile' }, { status: 500 });
   }
 }

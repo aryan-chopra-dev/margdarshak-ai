@@ -74,12 +74,12 @@ export default function OnboardingPage() {
     setStep(s => s + 1);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const errs = validateStep(step, form);
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    setProfile({
+    const profileData = {
       name: form.name.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
@@ -95,7 +95,20 @@ export default function OnboardingPage() {
       hasResearch: form.hasResearch,
       parentName: form.parentName.trim(),
       parentPhone: form.parentPhone.trim(),
-    });
+    };
+
+    try {
+      // Save to database
+      await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData),
+      });
+    } catch (e) {
+      console.error("Failed to save profile to DB", e);
+    }
+
+    setProfile(profileData);
     setOnboarded(true);
     router.push('/dashboard');
   };

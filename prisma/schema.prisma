@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 model Profile {
@@ -22,13 +22,13 @@ model Profile {
   workExperience          Int      @default(0)
   budget                  Int      @default(0)
   hasResearch             Boolean  @default(false)
-  shortlistedUniversities String[] // PostgreSQL supports string arrays
+  shortlistedUniversities String   @default("[]") // Stored as JSON string
   parentName              String?
   parentPhone             String?
   parentIncome            Int      @default(0)
   parentOccupation        String?
   kycVerified             Boolean  @default(false)
-  docsUploaded            String[]
+  docsUploaded            String   @default("[]") // Stored as JSON string
   
   lrsScore                Int      @default(300)
   intentScore             Int      @default(0)

@@ -78,7 +78,7 @@ export default function DashboardPage() {
                 }}>
                   <div style={{
                     width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-                    background: `${a.color}0A`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: `${a.color}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <a.icon size={18} color={a.color} />
                   </div>
@@ -227,7 +227,7 @@ export default function DashboardPage() {
                 {lrs.score >= 700 ? 'Pre-Approved ✓' : lrs.score >= 500 ? 'Getting There' : 'Just Starting'}
               </span>
             </div>
-            <Link href="/loan-score" className="btn-primary" style={{ width: '100%', fontSize: 13, padding: '10px' }}>
+            <Link href="/loan-score" className="btn-primary" style={{ width: '100%', fontSize: 13, padding: '10px', color: '#FFFFFF' }}>
               View Full Breakdown <ArrowRight size={14} />
             </Link>
           </div>

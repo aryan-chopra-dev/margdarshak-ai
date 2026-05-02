@@ -66,6 +66,10 @@ interface AppState {
   addBadge: (badge: string) => void;
   checkStreak: () => void;
 
+  // Theme
+  theme: 'light' | 'dark';
+  setTheme: (t: 'light' | 'dark') => void;
+
   // Chat
   chatOpen: boolean;
   setChatOpen: (val: boolean) => void;
@@ -203,6 +207,9 @@ export const useAppStore = create<AppState>()(
         return {}; // Failsafe
       }),
 
+      theme: 'light',
+      setTheme: (t) => set({ theme: t }),
+
       chatOpen: false,
       setChatOpen: (val) => set({ chatOpen: val }),
       chatHistory: [],
@@ -218,7 +225,8 @@ export const useAppStore = create<AppState>()(
         isOnboarded: state.isOnboarded,
         intentScore: state.intentScore,
         chatHistory: state.chatHistory,
-        streakDays: state.streakDays
+        streakDays: state.streakDays,
+        theme: state.theme,
       })
     }
   )

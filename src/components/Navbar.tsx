@@ -2,90 +2,151 @@
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { usePathname } from 'next/navigation';
+import ThemeToggle from './ThemeToggle';
 import {
-  Home, LayoutDashboard, Globe, Calculator, Target,
-  CalendarDays, Shield, Sparkles, Users, CreditCard, BarChart
+  LayoutDashboard, Globe, Calculator, Target,
+  CalendarDays, Shield, Sparkles, Users, GraduationCap,
+  FileCheck,
 } from 'lucide-react';
 
 const navItems = [
-  { label: 'Home', href: '/', icon: Home },
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Career Navigator', href: '/career-navigator', icon: Globe },
-  { label: 'ROI Calculator', href: '/roi-calculator', icon: Calculator },
-  { label: 'Admit Predictor', href: '/admission-predictor', icon: Target },
-  { label: 'Timeline', href: '/timeline', icon: CalendarDays },
-  { label: 'Scholarships', href: '/scholarships', icon: Globe },
-  { label: 'Marketplace', href: '/marketplace', icon: Shield },
-  { label: 'Community', href: '/community', icon: Users },
-  { label: 'Repayment', href: '/repayment', icon: CreditCard },
-  { label: 'B2B Admin', href: '/admin/monetization', icon: BarChart },
+  { label: 'Dashboard',    href: '/dashboard',           icon: LayoutDashboard },
+  { label: 'Universities', href: '/career-navigator',    icon: Globe },
+  { label: 'ROI',          href: '/roi-calculator',      icon: Calculator },
+  { label: 'Predictor',    href: '/admission-predictor', icon: Target },
+  { label: 'Scholarships', href: '/scholarships',        icon: GraduationCap },
+  { label: 'Apply',        href: '/apply',               icon: FileCheck },
+  { label: 'Timeline',     href: '/timeline',            icon: CalendarDays },
+  { label: 'LRS Score',    href: '/loan-score',          icon: Shield },
+  { label: 'Community',    href: '/community',           icon: Users },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
   const { isOnboarded, profile } = useAppStore();
+  const isPublic = pathname === '/' || pathname === '/login';
 
   return (
     <nav style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-      height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '0 32px',
-      background: 'rgba(255,255,255,0.92)',
-      backdropFilter: 'blur(12px)',
+      height: 56,
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '0 24px',
+      background: 'var(--nav-bg)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
       borderBottom: '1px solid var(--border)',
     }}>
       {/* Logo */}
       <Link href="/" style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 16,
-        color: 'var(--text)', textDecoration: 'none',
+        display: 'flex', alignItems: 'center', gap: 9,
+        textDecoration: 'none', flexShrink: 0,
       }}>
+        <div style={{
+          width: 30, height: 30, borderRadius: 9,
+          background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(99,102,241,0.40)',
+          fontSize: 15, fontWeight: 800, color: 'white',
+          fontFamily: "'Space Grotesk', sans-serif",
+        }}>M</div>
         <span style={{
-          width: 28, height: 28, borderRadius: 8,
-          background: 'var(--primary)', display: 'flex',
-          alignItems: 'center', justifyContent: 'center',
-          fontSize: 14, color: 'white',
-        }}>M</span>
-        Margdarshak
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontWeight: 700, fontSize: 15,
+          color: 'var(--heading)', letterSpacing: '-0.01em',
+        }}>
+          Margdarshak<span style={{ color: 'var(--primary)' }}> AI</span>
+        </span>
       </Link>
 
-      {/* Links */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        {navItems.map(item => {
-          const isActive = pathname === item.href;
-          return (
-            <Link key={item.href} href={item.href} style={{
-              display: 'flex', alignItems: 'center', gap: 5,
-              padding: '6px 12px', borderRadius: 'var(--radius-md)',
-              fontSize: 13, fontWeight: isActive ? 600 : 500,
-              color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
-              background: isActive ? 'var(--primary-bg)' : 'transparent',
-              textDecoration: 'none',
-              transition: 'color 0.15s, background 0.15s',
-            }}>
-              <item.icon size={14} />
-              {item.label}
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* CTA / User Profile */}
-      {isOnboarded ? (
-         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ 
-               width: 36, height: 36, borderRadius: '50%', background: 'var(--primary-bg)', 
-               border: '1px solid var(--primary-border)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-               fontSize: 14, fontWeight: 700, color: 'var(--primary)'
-            }}>
-               {(profile?.name?.charAt(0)?.toUpperCase()) || 'U'}
-            </div>
-         </div>
-      ) : (
-         <Link href="/onboarding" className="btn-primary" style={{ padding: '7px 18px', fontSize: 13 }}>
-            <Sparkles size={14} /> Get Started
-         </Link>
+      {/* Nav Items */}
+      {!isPublic && isOnboarded && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 1,
+          overflow: 'auto', flex: 1, justifyContent: 'center', padding: '0 16px',
+        }}>
+          {navItems.map(item => {
+            const isActive = pathname === item.href;
+            return (
+              <Link key={item.href} href={item.href} style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '5px 10px', borderRadius: 8,
+                fontSize: 12.5, fontWeight: isActive ? 600 : 400,
+                color: isActive ? 'var(--primary)' : 'var(--text-muted)',
+                background: isActive ? 'var(--primary-bg)' : 'transparent',
+                textDecoration: 'none',
+                transition: 'color 0.15s, background 0.15s',
+                whiteSpace: 'nowrap',
+                letterSpacing: '0.01em',
+                borderBottom: isActive ? '2px solid var(--primary)' : '2px solid transparent',
+              }}
+              onMouseEnter={e => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)';
+                  (e.currentTarget as HTMLElement).style.background = 'var(--bg-elevated)';
+                }
+              }}
+              onMouseLeave={e => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
+                  (e.currentTarget as HTMLElement).style.background = 'transparent';
+                }
+              }}>
+                <item.icon size={13} />
+                {item.label}
+              </Link>
+            );
+          })}
+        </div>
       )}
+
+      {/* Right: CTA / User */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        <ThemeToggle />
+        {isOnboarded ? (
+          <>
+            {/* LRS Pill */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '4px 12px 4px 8px',
+              background: 'var(--primary-bg)',
+              border: '1px solid var(--primary-border)',
+              borderRadius: 'var(--radius-full)',
+              fontSize: 12, fontWeight: 700, color: 'var(--primary-light)',
+            }}>
+              <Shield size={12} />
+              LRS
+            </div>
+            {/* Avatar */}
+            <Link href="/profile" style={{ textDecoration: 'none' }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 13, fontWeight: 700, color: 'white',
+                cursor: 'pointer',
+                boxShadow: '0 0 0 2px rgba(99,102,241,0.3)',
+              }}>
+                {(profile?.name?.charAt(0)?.toUpperCase()) || 'U'}
+              </div>
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link href="/login" style={{
+              fontSize: 13, fontWeight: 500,
+              color: 'var(--text-secondary)',
+              textDecoration: 'none', padding: '6px 12px',
+            }}>
+              Sign in
+            </Link>
+            <Link href="/onboarding" className="btn-primary" style={{ padding: '7px 16px', fontSize: 13 }}>
+              <Sparkles size={13} />
+              Get Started
+            </Link>
+          </>
+        )}
+      </div>
     </nav>
   );
 }
