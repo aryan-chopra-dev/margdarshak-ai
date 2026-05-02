@@ -9,6 +9,8 @@ import {
   ExternalLink, Maximize2, Minimize2
 } from 'lucide-react';
 
+const USD_TO_INR = 83;
+
 function generateResponse(query: string, profile: any): { response: string, steps: string[] } {
   // Simulate LangChain Orchestrator Routing
   const queryLower = query.toLowerCase();
@@ -38,8 +40,8 @@ function generateResponse(query: string, profile: any): { response: string, step
     recommendations.forEach(uni => {
       response += `**${uni.name} (${uni.country})**\n`;
       response += `• QS Rank: ${uni.qsRank2025 > 0 ? uni.qsRank2025 : 'N/A'}\n`;
-      response += `• Fees: $${uni.tuitionUSD.toLocaleString()}/yr\n`;
-      response += `• Median Earnings: $${uni.medianEarnings10yr.toLocaleString()} (10yr)\n\n`;
+      response += `• Fees: ₹${Math.round(uni.tuitionUSD * USD_TO_INR).toLocaleString()}/yr\n`;
+      response += `• Median Earnings: ₹${Math.round(uni.medianEarnings10yr * USD_TO_INR).toLocaleString()} (10yr)\n\n`;
     });
     
     steps.push("LangChain Router: Routing to Poonawala Loan API context...");

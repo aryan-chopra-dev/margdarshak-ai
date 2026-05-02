@@ -5,7 +5,7 @@ import { salaryData as salaries } from '@/data/salaries';
 import { loanProducts, calculateEMI } from '@/data/loans';
 import { useAppStore } from '@/lib/store';
 import {
-  Calculator, DollarSign, TrendingUp, ArrowRight, IndianRupee,
+  Calculator, IndianRupee, TrendingUp, ArrowRight,
   BarChart3, PieChart, Info
 } from 'lucide-react';
 
@@ -117,16 +117,16 @@ export default function ROICalculatorPage() {
           {/* Top metrics */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
             <MetricCard
-              icon={DollarSign}
+              icon={IndianRupee}
               label="Total Education Cost"
-              value={`$${Math.round(afterScholarship).toLocaleString()}`}
-              sub={`₹${Math.round(totalCostINR / 100000).toLocaleString()} Lakhs`}
+              value={`₹${Math.round(afterScholarship * USD_TO_INR).toLocaleString('en-IN')}`}
+              sub={`Approx. ₹${Math.round(totalCostINR / 100000).toLocaleString('en-IN')} Lakhs`}
               color="#6C3CE1"
             />
             <MetricCard
               icon={IndianRupee}
               label="Monthly EMI"
-              value={`₹${emi.emi.toLocaleString()}`}
+              value={`₹${emi.emi.toLocaleString('en-IN')}`}
               sub={`${loanTenure}yr at ${loanRate}% p.a.`}
               color="#0EA5E9"
             />
@@ -163,10 +163,10 @@ export default function ROICalculatorPage() {
                 }}>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>{item.label}</div>
                   <div style={{ fontSize: 20, fontWeight: item.bold ? 800 : 700, color: item.usd < 0 ? 'var(--success)' : 'var(--text)' }}>
-                    {item.usd < 0 ? '-' : ''}${Math.abs(item.usd).toLocaleString()}
+                    {item.usd < 0 ? '-' : ''}₹{Math.abs(Math.round(item.usd * USD_TO_INR)).toLocaleString('en-IN')}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    ₹{Math.abs(Math.round(item.usd * USD_TO_INR / 100000)).toLocaleString()} Lakhs
+                    Approx. ₹{Math.abs(Math.round(item.usd * USD_TO_INR / 100000)).toLocaleString('en-IN')} Lakhs
                   </div>
                 </div>
               ))}
@@ -191,10 +191,10 @@ export default function ROICalculatorPage() {
                 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>{item.label}</div>
                   <div style={{ fontSize: 22, fontWeight: 900, color: i > 0 ? 'var(--primary)' : 'var(--text)' }}>
-                    ${item.salary.toLocaleString()}
+                    ₹{Math.round(item.salary * USD_TO_INR).toLocaleString('en-IN')}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    ₹{Math.round(item.salary * USD_TO_INR / 100000)} LPA
+                    ₹{Math.round(item.salary * USD_TO_INR / 100000).toLocaleString('en-IN')} LPA
                   </div>
                   {item.growth && (
                     <div style={{ fontSize: 11, color: 'var(--success)', fontWeight: 700, marginTop: 4 }}>
@@ -241,7 +241,7 @@ export default function ROICalculatorPage() {
   );
 }
 
-function MetricCard({ icon: Icon, label, value, sub, color }: { icon: typeof DollarSign, label: string, value: string, sub: string, color: string }) {
+function MetricCard({ icon: Icon, label, value, sub, color }: { icon: typeof IndianRupee, label: string, value: string, sub: string, color: string }) {
   return (
     <div className="card-static" style={{ padding: 20 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>

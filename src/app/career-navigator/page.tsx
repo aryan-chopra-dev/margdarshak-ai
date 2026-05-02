@@ -3,10 +3,12 @@ import { useState, useMemo } from 'react';
 import { universities, allCountries, allPrograms, University } from '@/data/universities';
 import { useAppStore } from '@/lib/store';
 import {
-  Globe, Search, SlidersHorizontal, MapPin, DollarSign,
+  Globe, Search, SlidersHorizontal, MapPin, IndianRupee,
   Users, TrendingUp, GraduationCap, ExternalLink, Star,
   Heart, ChevronDown
 } from 'lucide-react';
+
+const USD_TO_INR = 83;
 
 export default function CareerNavigatorPage() {
   const { profile, setProfile, addIntentEvent } = useAppStore();
@@ -153,13 +155,13 @@ function UniversityCard({ uni, isFavorite, onToggleFav }: { uni: University, isF
 
           {/* Stats row */}
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <StatPill icon={DollarSign} label="Sticker Tuition/yr" value={`$${uni.tuitionUSD.toLocaleString()}`} />
+            <StatPill icon={IndianRupee} label="Sticker Tuition/yr" value={`₹${Math.round(uni.tuitionUSD * USD_TO_INR).toLocaleString('en-IN')}`} />
             {uni.avgNetPriceUSD !== uni.tuitionUSD && (
-              <StatPill icon={DollarSign} label="Avg Net Price" value={`$${uni.avgNetPriceUSD.toLocaleString()}`} hint="After aid — matches College Scorecard" />
+              <StatPill icon={IndianRupee} label="Avg Net Price" value={`₹${Math.round(uni.avgNetPriceUSD * USD_TO_INR).toLocaleString('en-IN')}`} hint="After aid — matches College Scorecard" />
             )}
-            <StatPill icon={TrendingUp} label="Median Earnings" value={`$${uni.medianEarnings10yr.toLocaleString()}`} hint="10 years after entry" />
+            <StatPill icon={TrendingUp} label="Median Earnings" value={`₹${Math.round(uni.medianEarnings10yr * USD_TO_INR).toLocaleString('en-IN')}`} hint="10 years after entry" />
             <StatPill icon={Users} label="Accept Rate" value={`${(uni.admissionRate * 100).toFixed(1)}%`} />
-            <StatPill icon={GraduationCap} label="Students" value={uni.studentSize.toLocaleString()} />
+            <StatPill icon={GraduationCap} label="Students" value={uni.studentSize.toLocaleString('en-IN')} />
           </div>
         </div>
 
@@ -215,7 +217,7 @@ function UniversityCard({ uni, isFavorite, onToggleFav }: { uni: University, isF
   );
 }
 
-function StatPill({ icon: Icon, label, value, hint }: { icon: typeof DollarSign, label: string, value: string, hint?: string }) {
+function StatPill({ icon: Icon, label, value, hint }: { icon: typeof IndianRupee, label: string, value: string, hint?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }} title={hint}>
       <Icon size={14} color="var(--text-muted)" />

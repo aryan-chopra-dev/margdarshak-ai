@@ -24,15 +24,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [isAuthenticated, pathname, mounted, router]);
 
-  // Prevent hydration mismatch flashes by not rendering children until mounted
-  if (!mounted) {
-    return <div style={{ minHeight: '100vh', background: 'var(--bg-main)' }} />;
-  }
-
   // If they are on a protected route and not authenticated, we render nothing while it redirects
   const isPublicRoute = pathname === '/' || pathname === '/login';
-  if (!isAuthenticated && !isPublicRoute) {
-    return <div style={{ minHeight: '100vh', background: 'var(--bg-main)' }} />;
+  if (mounted && !isAuthenticated && !isPublicRoute) {
+    return <div style={{ minHeight: '100vh', background: 'var(--bg)' }} />;
   }
 
   return <>{children}</>;

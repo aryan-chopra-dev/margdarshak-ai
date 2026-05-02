@@ -4,7 +4,7 @@ import { useAppStore } from '@/lib/store';
 import { usePathname } from 'next/navigation';
 import {
   Home, LayoutDashboard, Globe, Calculator, Target,
-  CalendarDays, Shield, Sparkles
+  CalendarDays, Shield, Sparkles, Users, CreditCard, BarChart
 } from 'lucide-react';
 
 const navItems = [
@@ -12,11 +12,13 @@ const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Career Navigator', href: '/career-navigator', icon: Globe },
   { label: 'ROI Calculator', href: '/roi-calculator', icon: Calculator },
-  { label: 'Admission Predictor', href: '/admission-predictor', icon: Target },
-  { label: 'Study Timeline', href: '/timeline', icon: CalendarDays },
+  { label: 'Admit Predictor', href: '/admission-predictor', icon: Target },
+  { label: 'Timeline', href: '/timeline', icon: CalendarDays },
   { label: 'Scholarships', href: '/scholarships', icon: Globe },
   { label: 'Marketplace', href: '/marketplace', icon: Shield },
-  { label: 'Marketing AI', href: '/admin/marketing', icon: Target },
+  { label: 'Community', href: '/community', icon: Users },
+  { label: 'Repayment', href: '/repayment', icon: CreditCard },
+  { label: 'B2B Admin', href: '/admin/monetization', icon: BarChart },
 ];
 
 export default function Navbar() {

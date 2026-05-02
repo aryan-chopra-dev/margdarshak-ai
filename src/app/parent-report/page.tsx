@@ -59,7 +59,7 @@ export default function ParentReportPage() {
     const netGain10yr = (salary.midCareerUSD * 10) - (uni.tuitionUSD * 2) - (preDegreeAnnualUSD * 10);
     const paybackYears = (uni.tuitionUSD * 2) / Math.max(1, salary.entryLevelUSD - preDegreeAnnualUSD);
     // ROI Score: composite of earnings/cost, acceptance potential, and EMI burden
-    const roiScore = (salary.medianEarnings10yr || salary.midCareerUSD) / Math.max(1, uni.tuitionUSD / 10) - emiToSalaryRatio;
+    const roiScore = (uni.medianEarnings10yr || salary.midCareerUSD) / Math.max(1, uni.tuitionUSD / 10) - emiToSalaryRatio;
     return { uni, salary, totalCostINR, emi, roiScore, emiToSalaryRatio, paybackYears, netGain10yr, recommended: false };
   });
 
@@ -147,7 +147,7 @@ export default function ParentReportPage() {
             <p className="doc-body-text" style={{ marginTop: 8 }}>
               Based on a composite scoring of 10-year median earnings, EMI-to-salary ratios, and institutional selectivity,
               our model recommends <strong>{recommended.uni.name}</strong> as the optimal investment, offering an estimated
-              net lifetime gain of <strong>₹{Math.round(recommended.netGain10yr * USD_TO_INR / 100000).toLocaleString()} Lakhs</strong> over
+              net lifetime gain of <strong>₹{Math.round(recommended.netGain10yr * USD_TO_INR / 100000).toLocaleString('en-IN')} Lakhs</strong> over
               10 years compared to a non-study-abroad trajectory.
             </p>
 
@@ -159,7 +159,7 @@ export default function ParentReportPage() {
                 <div className="doc-highlight-sub">Entry level vs pre-study baseline</div>
               </div>
               <div className="doc-highlight-box doc-highlight-blue">
-                <div className="doc-highlight-number">₹{recommended.emi.emi.toLocaleString()}</div>
+                <div className="doc-highlight-number">₹{recommended.emi.emi.toLocaleString('en-IN')}</div>
                 <div className="doc-highlight-label">Monthly EMI (recommended)</div>
                 <div className="doc-highlight-sub">Poonawala Fincorp @ {poonawala.interestRateMin}% for 10 yrs</div>
               </div>
@@ -230,16 +230,16 @@ export default function ParentReportPage() {
                       <div style={{ fontSize: 9, color: '#6B7280' }}>{a.uni.city}, {a.uni.country} · QS #{a.uni.qsRank2025 || 'N/A'}</div>
                     </td>
                     <td className="doc-td" style={{ textAlign: 'right', fontWeight: 600 }}>
-                      ₹{Math.round(a.totalCostINR / 100000).toLocaleString()}L
+                      ₹{Math.round(a.totalCostINR / 100000).toLocaleString('en-IN')}L
                     </td>
                     <td className="doc-td" style={{ textAlign: 'right' }}>
                       {(a.uni.admissionRate * 100).toFixed(1)}%
                     </td>
                     <td className="doc-td" style={{ textAlign: 'right' }}>
-                      ${a.salary!.entryLevelUSD.toLocaleString()}/yr
+                      ₹{Math.round(a.salary!.entryLevelUSD * USD_TO_INR).toLocaleString('en-IN')}/yr
                     </td>
                     <td className="doc-td" style={{ textAlign: 'right', fontWeight: 600 }}>
-                      ₹{a.emi.emi.toLocaleString()}
+                      ₹{a.emi.emi.toLocaleString('en-IN')}
                     </td>
                     <td className="doc-td" style={{ textAlign: 'right' }}>
                       <span style={{ color: a.emiToSalaryRatio < 30 ? '#059669' : a.emiToSalaryRatio < 50 ? '#D97706' : '#DC2626', fontWeight: 700 }}>
@@ -277,15 +277,15 @@ export default function ParentReportPage() {
               </div>
               <p className="doc-body-text">
                 Margdarshak AI selected <strong>{recommended.uni.name}</strong> as the optimal choice based on a multi-factor analysis.
-                The institution offers a post-graduation median salary of <strong>${recommended.salary!.midCareerUSD.toLocaleString()}/yr</strong> for {field}
+                The institution offers a post-graduation median salary of <strong>₹{Math.round(recommended.salary!.midCareerUSD * USD_TO_INR).toLocaleString('en-IN')}/yr</strong> for {field}
                 graduates, with an EMI-to-salary ratio of <strong>{recommended.emiToSalaryRatio.toFixed(0)}%</strong>{' '}
                 {recommended.emiToSalaryRatio < 30 ? '— comfortably within the 30% recommended threshold' : ''}.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 12 }}>
                 {[
-                  { icon: '💰', label: 'Net 10-yr Gain', val: `₹${Math.round(recommended.netGain10yr * USD_TO_INR / 100000).toLocaleString()}L`, sub: 'vs non-study-abroad' },
+                  { icon: '💰', label: 'Net 10-yr Gain', val: `₹${Math.round(recommended.netGain10yr * USD_TO_INR / 100000).toLocaleString('en-IN')}L`, sub: 'vs non-study-abroad' },
                   { icon: '📅', label: 'Loan Payback', val: `${recommended.paybackYears.toFixed(1)} yrs`, sub: 'expected duration' },
-                  { icon: '📈', label: '10-yr Earnings', val: `$${recommended.uni.medianEarnings10yr.toLocaleString()}`, sub: 'alumni median (US DoE)' },
+                  { icon: '📈', label: '10-yr Earnings', val: `₹${Math.round(recommended.uni.medianEarnings10yr * USD_TO_INR).toLocaleString('en-IN')}`, sub: 'alumni median (US DoE)' },
                 ].map((item, i) => (
                   <div key={i} style={{ padding: '8px 10px', background: 'white', borderRadius: 6, border: '1px solid #C7D2FE' }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: '#111827' }}>{item.icon} {item.label}</div>
@@ -309,10 +309,10 @@ export default function ParentReportPage() {
                       {a.emiToSalaryRatio > 40
                         ? `High EMI burden (${a.emiToSalaryRatio.toFixed(0)}% of salary)`
                         : a.uni.tuitionUSD > recommended.uni.tuitionUSD
-                        ? `Higher tuition cost (+$${(a.uni.tuitionUSD - recommended.uni.tuitionUSD).toLocaleString()}/yr)`
+                        ? `Higher tuition cost (+₹${Math.round((a.uni.tuitionUSD - recommended.uni.tuitionUSD) * USD_TO_INR).toLocaleString('en-IN')}/yr)`
                         : `Lower composite ROI score (earnings-to-cost ratio)`}
                       {a.netGain10yr < recommended.netGain10yr
-                        ? `. Net 10-yr gain ₹${Math.round((recommended.netGain10yr - a.netGain10yr) * USD_TO_INR / 100000).toLocaleString()}L lower than recommended option.`
+                        ? `. Net 10-yr gain ₹${Math.round((recommended.netGain10yr - a.netGain10yr) * USD_TO_INR / 100000).toLocaleString('en-IN')}L lower than recommended option.`
                         : ''}
                     </div>
                   </div>
@@ -338,7 +338,7 @@ export default function ParentReportPage() {
                 { step: '02', label: 'Processing', time: 'Day 4–7', desc: 'Credit assessment, co-applicant income verification, university ranking check', color: '#0D9488' },
                 { step: '03', label: 'Sanction', time: 'Day 8–10', desc: 'Loan sanction letter issued. Share with university for visa/I-20 purposes', color: '#059669' },
                 { step: '04', label: 'Moratorium', time: 'During Course', desc: 'No EMI during study period. Interest-only or deferred — option available', color: '#D97706' },
-                { step: '05', label: 'Repayment', time: 'Post Graduation', desc: `EMI of ₹${recommended.emi.emi.toLocaleString()}/mo begins. Covers fully in ${recommended.paybackYears.toFixed(1)} yrs`, color: '#DC2626' },
+                { step: '05', label: 'Repayment', time: 'Post Graduation', desc: `EMI of ₹${recommended.emi.emi.toLocaleString('en-IN')}/mo begins. Covers fully in ${recommended.paybackYears.toFixed(1)} yrs`, color: '#DC2626' },
               ].map((item, i) => (
                 <div key={i} className="doc-journey-step" style={{ borderTopColor: item.color }}>
                   <div style={{ fontSize: 18, fontWeight: 900, color: item.color }}>{item.step}</div>
@@ -360,13 +360,13 @@ export default function ParentReportPage() {
                 <div className="doc-subsection-title">Recommended Option: {recommended.uni.name}</div>
                 <table className="doc-inner-table">
                   <tbody>
-                    <tr><td className="doc-inner-td-label">Total Program Cost</td><td className="doc-inner-td-val">₹{Math.round(recommended.totalCostINR / 100000).toLocaleString()} Lakhs</td></tr>
-                    <tr><td className="doc-inner-td-label">Loan Amount</td><td className="doc-inner-td-val">₹{Math.round(recommended.totalCostINR / 100000).toLocaleString()} Lakhs</td></tr>
+                    <tr><td className="doc-inner-td-label">Total Program Cost</td><td className="doc-inner-td-val">₹{Math.round(recommended.totalCostINR / 100000).toLocaleString('en-IN')} Lakhs</td></tr>
+                    <tr><td className="doc-inner-td-label">Loan Amount</td><td className="doc-inner-td-val">₹{Math.round(recommended.totalCostINR / 100000).toLocaleString('en-IN')} Lakhs</td></tr>
                     <tr><td className="doc-inner-td-label">Interest Rate</td><td className="doc-inner-td-val">{poonawala.interestRateMin}% p.a. (reducing)</td></tr>
                     <tr><td className="doc-inner-td-label">Tenure</td><td className="doc-inner-td-val">10 years post moratorium</td></tr>
-                    <tr><td className="doc-inner-td-label">Monthly EMI</td><td className="doc-inner-td-val" style={{ fontWeight: 800, color: '#4F46E5' }}>₹{recommended.emi.emi.toLocaleString()}</td></tr>
-                    <tr><td className="doc-inner-td-label">Total Interest Paid</td><td className="doc-inner-td-val">₹{Math.round(recommended.emi.totalInterest / 100000).toLocaleString()} Lakhs</td></tr>
-                    <tr><td className="doc-inner-td-label">Total Repayment</td><td className="doc-inner-td-val" style={{ fontWeight: 700 }}>₹{Math.round(recommended.emi.totalPayment / 100000).toLocaleString()} Lakhs</td></tr>
+                    <tr><td className="doc-inner-td-label">Monthly EMI</td><td className="doc-inner-td-val" style={{ fontWeight: 800, color: '#4F46E5' }}>₹{recommended.emi.emi.toLocaleString('en-IN')}</td></tr>
+                    <tr><td className="doc-inner-td-label">Total Interest Paid</td><td className="doc-inner-td-val">₹{Math.round(recommended.emi.totalInterest / 100000).toLocaleString('en-IN')} Lakhs</td></tr>
+                    <tr><td className="doc-inner-td-label">Total Repayment</td><td className="doc-inner-td-val" style={{ fontWeight: 700 }}>₹{Math.round(recommended.emi.totalPayment / 100000).toLocaleString('en-IN')} Lakhs</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -374,7 +374,7 @@ export default function ParentReportPage() {
                 <div className="doc-subsection-title">Post-Graduation Salary vs EMI</div>
                 <div style={{ padding: 12, background: '#F0FDF4', border: '1px solid #D1FAE5', borderRadius: 6, marginBottom: 8 }}>
                   <div style={{ fontSize: 9, color: '#065F46', marginBottom: 4 }}>Expected monthly income (entry level)</div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: '#059669' }}>₹{Math.round(recommended.salary!.entryLevelUSD * USD_TO_INR / 12).toLocaleString()}</div>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: '#059669' }}>₹{Math.round(recommended.salary!.entryLevelUSD * USD_TO_INR / 12).toLocaleString('en-IN')}</div>
                   <div style={{ fontSize: 8, color: '#6B7280' }}>{field} in {recommended.uni.country} · BLS/HESA verified</div>
                 </div>
                 <div style={{ padding: 12, background: recommended.emiToSalaryRatio < 30 ? '#EFF6FF' : '#FFFBEB', border: `1px solid ${recommended.emiToSalaryRatio < 30 ? '#BFDBFE' : '#FDE68A'}`, borderRadius: 6 }}>
@@ -393,7 +393,7 @@ export default function ParentReportPage() {
                 <div style={{ padding: 10, background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: 6, marginTop: 8 }}>
                   <div style={{ fontSize: 9, fontWeight: 700, color: '#374151', marginBottom: 4 }}>Section 80E Tax Benefit</div>
                   <div style={{ fontSize: 8.5, color: '#6B7280', lineHeight: 1.5 }}>
-                    The entire interest component of the education loan EMI (est. ₹{Math.round(recommended.emi.totalInterest / 120000).toLocaleString()}/mo in Year 1)
+                    The entire interest component of the education loan EMI (est. ₹{Math.round(recommended.emi.totalInterest / 120000).toLocaleString('en-IN')}/mo in Year 1)
                     is tax-deductible for up to 8 years under Section 80E of the Income Tax Act, 1961. This effectively reduces the net EMI cost by 25–30%.
                   </div>
                 </div>
@@ -476,8 +476,8 @@ export default function ParentReportPage() {
                 <p className="doc-body-text">Scholarship awards reduce the principal loan amount and therefore the monthly EMI burden. The following scholarship types are available for consideration:</p>
                 <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {[
-                    { name: 'Merit-Based Scholarships', benefit: 'Up to $25,000/yr', note: 'Based on GPA + GRE' },
-                    { name: 'Need-Based Aid', benefit: 'Up to $15,000/yr', note: 'Family income assessed' },
+                    { name: 'Merit-Based Scholarships', benefit: 'Up to ₹20,00,000/yr', note: 'Based on GPA + GRE' },
+                    { name: 'Need-Based Aid', benefit: 'Up to ₹12,00,000/yr', note: 'Family income assessed' },
                     { name: 'Poonawala Top-up', benefit: '₹50,000 cashback', note: 'On loan disbursement' },
                     { name: 'Marketplace Savings', benefit: '5% on forex/travel', note: 'Via Margdarshak' },
                   ].map((s, i) => (
@@ -530,7 +530,7 @@ export default function ParentReportPage() {
               Our model recommends this institution for its superior earnings-to-cost ratio, manageable EMI burden of{' '}
               {recommended.emiToSalaryRatio.toFixed(0)}% of post-graduation income, and strong 10-year earnings data.
               This investment is projected to generate a net financial advantage of{' '}
-              ₹{Math.round(recommended.netGain10yr * USD_TO_INR / 100000).toLocaleString()} Lakhs over 10 years.
+              ₹{Math.round(recommended.netGain10yr * USD_TO_INR / 100000).toLocaleString('en-IN')} Lakhs over 10 years.
             </div>
             <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.6)', borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: 10, marginTop: 4 }}>
               This report is generated by Margdarshak AI using verified data from US Dept. of Education, BLS, HESA, NIRF, and StatsCan.

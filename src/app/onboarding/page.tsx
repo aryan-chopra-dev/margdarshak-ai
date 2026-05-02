@@ -207,8 +207,8 @@ export default function OnboardingPage() {
       icon: Calculator,
       content: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <Field label="Total Budget (USD per year)">
-            <input className="input-field" type="number" min="0" placeholder="e.g. 40000"
+          <Field label="Total Budget (₹ per year)">
+            <input className="input-field" type="number" min="0" placeholder="e.g. 3000000"
               value={form.budget} onChange={e => update('budget', e.target.value)} />
           </Field>
           <Field label="Parent / Co-applicant Name">
