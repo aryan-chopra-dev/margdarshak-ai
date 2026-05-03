@@ -208,7 +208,7 @@ export const knowledgeBase: KnowledgeChunk[] = [
     id: "margdarshak-arch-overall",
     category: "Architecture",
     title: "Margdarshak AI - Platform Overview",
-    content: "Margdarshak AI is an agentic AI guide built for the Meta Hackathon to assist students with Higher Education & Loan Readiness. It bridges the gap between academic preparation and financial securing (specifically targeting Poonawala Fincorp's ₹40L Zero-Collateral and ₹1Cr loan options). Key features include: the Loan Readiness Score (LRS), the Dual-Model XGBoost Admission Predictor, a Career Navigator, a Parent-Persuasion Report, and an LLM-powered Copilot Chatbot that utilizes localized FAISS-style Vector search.",
+    content: "Margdarshak AI is an agentic AI guide built for the Meta Hackathon to assist students with Higher Education & Loan Readiness. It bridges the gap between academic preparation and financial securing (specifically targeting Poonawala Fincorp's ₹40L Zero-Collateral and ₹1Cr loan options). Key features include: the Loan Readiness Score (LRS), the Admission Predictor (MLR model, Acharya et al. 2019, R²=0.82), a Career Navigator, a Parent-Persuasion Report, and an LLM-powered Copilot Chatbot that utilizes a local MiniLM vector search engine.",
     keywords: ["margdarshak ai", "poonawala fincorp", "meta hackathon", "platform overview", "loan readiness score"],
     source: "Margdarshak System Architecture",
     sourceUrl: "internal://architecture",
@@ -217,11 +217,11 @@ export const knowledgeBase: KnowledgeChunk[] = [
   {
     id: "margdarshak-arch-ml",
     category: "Architecture",
-    title: "Machine Learning (Dual-Model XGBoost)",
-    content: "The Margdarshak admission predictor does not use a generic ML model. It utilizes a Dual-Model Architecture powered by XGBoost. Model 1 (Study Abroad) merges Kaggle applicant data, QS World Rankings, and the US College Scorecard API. Model 2 (Domestic India) synthesizes NIRF rankings and GATE/CAT percentiles. Both pipelines were explicitly trained using Python, generating dedicated weights and `.pkl` binaries that evaluate the applicant's exact CGPA, Test Scores, and Work Experience securely.",
-    keywords: ["xgboost", "dual-model architecture", "machine learning", "admission predictor", "qa rankings", "nirf"],
-    source: "Margdarshak System Architecture",
-    sourceUrl: "internal://architecture",
+    title: "Admission Predictor — Multiple Linear Regression (MLR) Model",
+    content: "The Margdarshak admission predictor uses a peer-reviewed Multiple Linear Regression (MLR) model from Acharya et al. (2019), trained on the Kaggle Graduate Admissions dataset (500 records, R²=0.82). Inputs: GRE score (260-340), TOEFL/IELTS, CGPA (out of 10), University Tier (1-5), SOP strength (1-5), LOR strength (1-5), Research experience (binary), and Work experience (years). The model accurately explains 82% of variance in admission outcomes and is clearly disclosed as MLR — not a black-box ensemble.",
+    keywords: ["mlr", "linear regression", "admission model", "admission predictor", "r squared", "kaggle", "graduate admissions"],
+    source: "Acharya et al. (2019) - A Comparison of Regression Models",
+    sourceUrl: "https://www.kaggle.com/datasets/mohansacharya/graduate-admissions",
     lastVerified: "2026-04"
   },
   {

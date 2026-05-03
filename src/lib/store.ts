@@ -46,11 +46,19 @@ interface AppState {
   login: (name: string, email: string, phone: string) => void;
   logout: () => void;
 
+  // Hydration flag (for SSR/client sync)
+  isHydrated: boolean;
+  setHydrated: (val: boolean) => void;
+
   // User
   profile: UserProfile;
   isOnboarded: boolean;
   setProfile: (updates: Partial<UserProfile>) => void;
   setOnboarded: (val: boolean) => void;
+
+  // Onboarding draft (persisted so users don't lose multi-step form progress)
+  onboardingDraft: { step: number; form: Record<string, unknown> } | undefined;
+  setOnboardingDraft: (draft: { step: number; form: Record<string, unknown> } | undefined) => void;
 
   // LRS
   lrs: LRSState;
@@ -90,7 +98,7 @@ const defaultProfile: UserProfile = {
   kycVerified: false,
 };
 
-function calculateLRS(profile: UserProfile): LRSState {
+function calculateLRS(profile: UserProfile, engagementSignal = 0): LRSState {
   // Profile Completeness (25%)
   let profileScore = 0;
   if (profile.name) profileScore += 15;
@@ -120,11 +128,15 @@ function calculateLRS(profile: UserProfile): LRSState {
   if (shortlistCount > 2) shortlistScore = 100;
 
   // Compute total (Base 300, max 850)
-  const total = 300 + 
+  // [FIX FM-3]: All 5 components now correctly included.
+  // Weights: profile(25%) + docs(25%) + coApp(20%) + shortlist(15%) + engagement(15%) = 100%
+  // Multiplier: max_score = 300 + (100 * 1.0 * 5.5) = 850 ✓
+  const total = 300 +
     (profileScore * 0.25 * 5.5) +
     (docScore * 0.25 * 5.5) +
     (coAppScore * 0.20 * 5.5) +
-    (shortlistScore * 0.15 * 5.5);
+    (shortlistScore * 0.15 * 5.5) +
+    (engagementSignal * 0.15 * 5.5); // Previously MISSING — capped max at 767.5
 
   return {
     score: Math.min(850, Math.round(total)),
@@ -133,7 +145,7 @@ function calculateLRS(profile: UserProfile): LRSState {
       documentReadiness: docScore,
       coApplicantDetails: coAppScore,
       universityShortlist: shortlistScore,
-      engagementSignal: 0, // Gets updated dynamically
+      engagementSignal,
     }
   };
 }
@@ -151,7 +163,7 @@ export const useAppStore = create<AppState>()(
       login: (name: string, email: string, phone: string) => set((state) => ({
         isAuthenticated: true,
         profile: { ...state.profile, name, email, phone },
-        lrs: calculateLRS({ ...state.profile, name, email, phone })
+        lrs: calculateLRS({ ...state.profile, name, email, phone }, state.intentScore)
       })),
       logout: () => set({
         isAuthenticated: false,
@@ -166,7 +178,7 @@ export const useAppStore = create<AppState>()(
       isOnboarded: false,
       setProfile: (updates) => set((state) => {
         const newProfile = { ...state.profile, ...updates };
-        return { profile: newProfile, lrs: calculateLRS(newProfile) };
+        return { profile: newProfile, lrs: calculateLRS(newProfile, state.intentScore) };
       }),
       setOnboarded: (val) => set({ isOnboarded: val }),
 
@@ -177,14 +189,14 @@ export const useAppStore = create<AppState>()(
           coApplicantDetails: 0, universityShortlist: 0, engagementSignal: 0
         }
       },
-      updateLRS: () => set((state) => ({ lrs: calculateLRS(state.profile) })),
+      updateLRS: () => set((state) => ({ lrs: calculateLRS(state.profile, state.intentScore) })),
 
       intentScore: 0,
       addIntentEvent: (points) => set((state) => {
         const newIntent = Math.min(100, state.intentScore + points);
-        const newLRS = { ...state.lrs };
-        newLRS.breakdown.engagementSignal = newIntent;
-        return { intentScore: newIntent, lrs: newLRS };
+        // Recalculate the full LRS with the updated engagement signal
+        // so the score total is always mathematically consistent
+        return { intentScore: newIntent, lrs: calculateLRS(state.profile, newIntent) };
       }),
 
       streakDays: 0,

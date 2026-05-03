@@ -23,9 +23,21 @@ export default function ScholarshipsPage() {
         body: JSON.stringify({ scholarship, profile })
       });
       const data = await res.json();
-      setEvalResults(prev => ({ ...prev, [scholarship.id]: data }));
+      // [FIX FM-2b]: The API now returns a proper 500 on AI engine failure
+      // instead of a fake 50% score. Handle it gracefully on the client.
+      if (!res.ok) {
+        setEvalResults(prev => ({ ...prev, [scholarship.id]: {
+          percentage: -1,
+          reasoning: data.error || 'AI eligibility engine is temporarily unavailable. Please try again in a moment.'
+        }}));
+      } else {
+        setEvalResults(prev => ({ ...prev, [scholarship.id]: data }));
+      }
     } catch (err) {
-      setEvalResults(prev => ({ ...prev, [scholarship.id]: { percentage: 0, reasoning: "Network error mapping real-world variables." } }));
+      setEvalResults(prev => ({ ...prev, [scholarship.id]: {
+        percentage: -1,
+        reasoning: "Network error — could not reach the eligibility engine. Please check your connection."
+      }}));
     }
     setEvaluating(null);
   };
@@ -104,6 +116,27 @@ export default function ScholarshipsPage() {
             </div>
             
             {evalResults[scholarship.id] ? (
+              evalResults[scholarship.id].percentage === -1 ? (
+                /* Error state — AI engine failed */
+                <div style={{ marginTop: 20, padding: 16, border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, background: 'rgba(239,68,68,0.05)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#EF4444' }}>⚠ EVALUATION ERROR</span>
+                  </div>
+                  <p style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
+                    {evalResults[scholarship.id].reasoning}
+                  </p>
+                  <button
+                    className="btn btn-secondary"
+                    style={{ marginTop: 12, width: '100%', fontSize: 12 }}
+                    onClick={() => {
+                      setEvalResults(prev => { const next = { ...prev }; delete next[scholarship.id]; return next; });
+                      handleEvaluate(scholarship);
+                    }}
+                  >
+                    Retry Evaluation
+                  </button>
+                </div>
+              ) : (
               <div style={{ marginTop: 20, padding: 16, border: '1px solid var(--border)', borderRadius: 8, background: 'var(--primary-bg)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                    <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>AI FIT PREDICTION</span>
@@ -122,6 +155,7 @@ export default function ScholarshipsPage() {
                    </a>
                 </div>
               </div>
+              )
             ) : (
               <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
                 <button 

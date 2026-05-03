@@ -65,7 +65,7 @@ export default function OnboardingPage() {
     // Restore from draft if available, otherwise initialize from auth profile
     if (onboardingDraft?.form) {
       setStep(onboardingDraft.step);
-      setForm(onboardingDraft.form);
+      setForm(onboardingDraft.form as typeof form);
     } else {
       setForm(f => ({ 
         ...f, 

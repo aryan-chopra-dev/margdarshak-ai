@@ -12,13 +12,16 @@
 //   Chance of Admit (0.34-0.97)
 //
 // Below is a STATISTICAL SUMMARY extracted from the dataset, along with
-// the regression coefficients from the published model, which we use for
-// client-side admission probability prediction.
+// the regression coefficients from the published Multiple Linear Regression (MLR)
+// model, which we use for client-side admission probability prediction.
+// Note: The original paper evaluated multiple models (LR, RF, ANN).
+// The coefficients below are from the Linear Regression model (Table 4),
+// which achieved R² = 0.82 — making it the most transparent and auditable choice.
 // ============================================================================
 
-// Regression coefficients from the published XGBoost/Linear Regression model
+// Multiple Linear Regression (MLR) coefficients from Acharya et al. (2019)
 // These weights determine how each factor contributes to admission probability
-// Source: Acharya et al. (2019), Table 4
+// Source: Acharya et al. (2019), Table 4 — Linear Regression model
 export const admissionModel = {
   intercept: -1.2725,
   coefficients: {
@@ -31,9 +34,10 @@ export const admissionModel = {
     hasResearch: 0.0244,    // Binary: has research experience
     workExperience: 0.0085, // Per year of work experience (our addition)
   },
-  // R² = 0.82 (from the paper) — model explains 82% of variance
+  // R² = 0.82 (from the paper) — model explains 82% of variance in the dataset
   r2Score: 0.82,
-  dataSource: "Kaggle Graduate Admissions Dataset (Mohan S Acharya)",
+  modelType: "Multiple Linear Regression (MLR)",
+  dataSource: "Kaggle Graduate Admissions Dataset (Mohan S Acharya, 500 records)",
   sourceUrl: "https://www.kaggle.com/datasets/mohansacharya/graduate-admissions",
   paperReference: "Acharya et al. (2019) - A Comparison of Regression Models for Prediction of Graduate Admissions"
 };

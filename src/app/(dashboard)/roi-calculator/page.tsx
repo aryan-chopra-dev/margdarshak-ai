@@ -1,9 +1,9 @@
 'use client';
 import { useState, useMemo } from 'react';
 import { universities } from '@/data/universities';
-import { salaryData as salaries } from '@/data/salaries';
 import { loanProducts, calculateEMI } from '@/data/loans';
 import { useAppStore } from '@/lib/store';
+import { salaryData as salaries, indianBaselineSalary } from '@/data/salaries';
 import {
   Calculator, IndianRupee, TrendingUp, ArrowRight,
   BarChart3, PieChart, Info
@@ -43,16 +43,26 @@ export default function ROICalculatorPage() {
   // Loan EMI
   const emi = calculateEMI(totalCostINR, loanRate, loanTenure);
 
-  // Salary projections
-  const preDegree = 4820; // Indian baseline from PLFS
+  // [FIX FM-9]: Dynamic pre-degree baseline from PLFS data, keyed on work experience.
+  // Previously hardcoded at $4,820 for ALL users regardless of seniority.
+  const preDegree =
+    profile.workExperience >= 3 ? indianBaselineSalary.withExperience3to5 :
+    profile.workExperience >= 1 ? indianBaselineSalary.withExperience1to3 :
+    indianBaselineSalary.freshGraduate; // $4,820 only for fresh graduates
+
   const postDegreeEntry = salary.entryLevelUSD;
   const postDegreeMid = salary.midCareerUSD;
   const postDegreeSenior = salary.seniorLevelUSD;
 
-  // ROI
+  // [FIX FM-2]: ROI now correctly accounts for total loan cost (principal + interest).
+  // Previously emi.totalInterest was ignored, making the loan sliders mathematical placebos.
+  const totalInterestUSD = emi.totalInterest / USD_TO_INR; // convert INR back to USD basis
+  const totalCostWithInterest = afterScholarship + totalInterestUSD;
+
+  // 10-year earnings gain over staying in India without the degree
   const earningsGain10yr = (postDegreeEntry * 3 + postDegreeMid * 5 + postDegreeSenior * 2) - (preDegree * 10);
-  const roi = ((earningsGain10yr - afterScholarship) / afterScholarship * 100);
-  const breakEvenYears = afterScholarship / (postDegreeEntry - preDegree);
+  const roi = ((earningsGain10yr - totalCostWithInterest) / totalCostWithInterest * 100);
+  const breakEvenYears = totalCostWithInterest / Math.max(1, postDegreeEntry - preDegree);
 
   return (
     <div className="page-container">

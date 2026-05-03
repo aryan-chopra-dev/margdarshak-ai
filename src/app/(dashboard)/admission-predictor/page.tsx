@@ -39,7 +39,7 @@ export default function AdmissionPredictorPage() {
       <div className="section-label"><Target size={14} /> Admission Predictor</div>
       <h1 className="page-title">Predict Your Admission Chances</h1>
       <p className="page-subtitle" style={{ marginBottom: 32 }}>
-        ML model trained via XGBoost on Kaggle Graduate Admissions dataset (Acharya et al., 2019) — R² = 0.89
+        Multiple Linear Regression model trained on Kaggle Graduate Admissions dataset (Acharya et al., 2019) — R² = 0.82, N = 500
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: 24, alignItems: 'flex-start' }}>
@@ -197,10 +197,10 @@ export default function AdmissionPredictorPage() {
               {/* Source citation */}
               <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '0 4px', marginTop: 12 }}>
                 <span className="tag" style={{ background: 'var(--blue-50)', color: 'var(--blue-700)', border: '1px solid var(--blue-200)', marginRight: 6 }}>
-                  Scoring Engine: XGBoost
+                  Model: MLR (R²=0.82)
                 </span>
                 <Info size={14} />
-                Model: XGBoost Gradient Boosting (R²=0.89), Retrained on Kaggle Graduate Admissions (Acharya et al.)
+                Multiple Linear Regression on Kaggle Graduate Admissions dataset (Acharya et al., 2019, N=500)
                 <a href="https://www.kaggle.com/datasets/mohansacharya/graduate-admissions" target="_blank" rel="noopener" style={{ color: 'var(--primary)' }}>
                   Verify source →
                 </a>

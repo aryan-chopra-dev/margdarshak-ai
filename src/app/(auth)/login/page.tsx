@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import {
@@ -19,7 +19,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [delivery, setDelivery] = useState<'email' | 'demo'>('demo');
-  const [demoOtp, setDemoOtp] = useState('');
   const [countdown, setCountdown] = useState(0);
 
   // Resend countdown
@@ -49,11 +48,13 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.error || 'Failed to send OTP.');
 
       setDelivery(data.delivery || 'demo');
-      if (data.demoOtp) setDemoOtp(data.demoOtp);
+      // [FIX NEW-1]: demoOtp is no longer returned in the API response for security.
+      // In demo mode, the OTP is only visible in the server console (npm run dev output).
       setStep('otp');
       setCountdown(30);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to send OTP.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -75,19 +76,60 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Verification failed.');
 
-      // Update Zustand store with the authenticated user
+      // Step 1: Set auth identity in Zustand
       login(data.profile.name, data.profile.email, data.profile.phone || phone);
+
+      // Step 2: [FIX NEW-2] Hydrate the full profile from the database.
+      // Without this, returning users log in to a blank local slate, and the
+      // first subsequent save would destructively overwrite their cloud profile.
+      try {
+        const profileRes = await fetch(`/api/profile?email=${encodeURIComponent(data.profile.email)}`);
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          if (profileData.profile) {
+            const { setProfile, setOnboarded } = useAppStore.getState();
+            setProfile({
+              gpa: profileData.profile.gpa || 0,
+              greScore: profileData.profile.greScore || 0,
+              toeflScore: profileData.profile.toeflScore || 0,
+              ieltsScore: profileData.profile.ieltsScore || 0,
+              workExperience: profileData.profile.workExperience || 0,
+              budget: profileData.profile.budget || 0,
+              targetCountry: profileData.profile.targetCountry || '',
+              targetField: profileData.profile.targetField || '',
+              degree: profileData.profile.degree || 'masters',
+              stage: profileData.profile.stage || 'explorer',
+              hasResearch: profileData.profile.hasResearch || false,
+              shortlistedUniversities: profileData.profile.shortlistedUniversities || [],
+              docsUploaded: profileData.profile.docsUploaded || [],
+              parentName: profileData.profile.parentName || '',
+              parentPhone: profileData.profile.parentPhone || '',
+              parentIncome: profileData.profile.parentIncome || 0,
+              parentOccupation: profileData.profile.parentOccupation || '',
+              kycVerified: profileData.profile.kycVerified || false,
+            });
+            // Mark as onboarded if the saved profile has meaningful data
+            if (profileData.profile.targetCountry || profileData.profile.gpa > 0) {
+              setOnboarded(true);
+            }
+          }
+        }
+      } catch (hydrateErr) {
+        // Non-fatal: user can still proceed; local state will be blank for new users
+        console.warn('Profile hydration failed (non-fatal for new users):', hydrateErr);
+      }
+
       setStep('done');
 
       // Check if user has already completed onboarding (returning user)
-      // The store's isOnboarded state tells us this
       const { isOnboarded } = useAppStore.getState();
 
       setTimeout(() => {
         router.push(isOnboarded ? '/dashboard' : '/onboarding');
       }, 800);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Verification failed.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -202,27 +244,22 @@ export default function LoginPage() {
             }}>
               {delivery === 'email'
                 ? <><CheckCircle2 size={16} /> OTP sent to {email}</>
-                : <><Key size={16} /> Demo Mode — your OTP is shown below</>}
+                : <><Key size={16} /> Demo Mode — check the server console for your OTP</>}
             </div>
 
-            {/* Demo OTP display */}
-            {delivery === 'demo' && demoOtp && (
+            {/* Demo mode instruction — OTP is server-side only for security */}
+            {delivery === 'demo' && (
               <div style={{
-                padding: '20px', borderRadius: 12, textAlign: 'center',
+                padding: '16px', borderRadius: 12, textAlign: 'center',
                 background: 'linear-gradient(135deg, rgba(79,70,229,0.06), rgba(139,92,246,0.06))',
                 border: '2px dashed rgba(79,70,229,0.3)',
               }}>
-                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>
-                  Your verification code
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Demo Mode
                 </p>
-                <div style={{
-                  fontSize: 40, fontWeight: 900, letterSpacing: '12px',
-                  color: 'var(--primary)', fontFamily: 'monospace',
-                }}>
-                  {demoOtp}
-                </div>
-                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>
-                  Enter this code below • Expires in 10 minutes
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                  Your OTP is printed to the <strong>server console</strong>.<br />
+                  Open your terminal running <code style={{ background: 'var(--bg-elevated)', padding: '1px 6px', borderRadius: 4 }}>npm run dev</code> to find it.
                 </p>
               </div>
             )}

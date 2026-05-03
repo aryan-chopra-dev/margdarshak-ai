@@ -82,10 +82,12 @@ export async function POST(req: Request) {
     console.log(`  📱  Phone  : ${phone}`);
     console.log(`${'═'.repeat(50)}\n`);
 
+    // SECURITY: OTP is intentionally NOT included in the response payload.
+    // Any user could read the Network tab and bypass authentication if we returned it.
+    // In demo mode (no email configured), the OTP is only printed to the SERVER console above.
     return NextResponse.json({
-      message:  'OTP generated (demo mode).',
+      message:  'OTP generated. Check the server console for the verification code.',
       delivery: 'demo',
-      demoOtp:  otp,
     });
   } catch (error) {
     console.error('Error in send-otp:', error);

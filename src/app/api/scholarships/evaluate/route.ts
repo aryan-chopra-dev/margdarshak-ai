@@ -52,12 +52,19 @@ Standardized Scores: GRE ${profile.greScore || 'N/A'}, IELTS ${profile.ieltsScor
     let parsedContent;
     try {
         parsedContent = JSON.parse(data.choices[0].message.content);
+        // Validate expected schema
+        if (typeof parsedContent.percentage !== 'number' || typeof parsedContent.reasoning !== 'string') {
+          throw new Error('Invalid schema from Groq response');
+        }
     } catch (e) {
-        // Fallback robust parsing if Groq messes up the JSON
-        parsedContent = {
-            percentage: 50,
-            reasoning: "Eligibility engine temporarily degraded. Review manually."
-        };
+        // [FIX FM-2b]: Previously returned a fake 50% score on parse failure.
+        // This was actively misleading — users saw "50% eligible" when the engine crashed.
+        // Now we return a proper 500 so the client can show a real error state.
+        console.error('Groq JSON parse or schema error:', e, '\nRaw content:', data.choices[0]?.message?.content);
+        return NextResponse.json(
+          { error: 'AI eligibility engine returned malformed data. Please try again in a moment.' },
+          { status: 500 }
+        );
     }
 
     return NextResponse.json(parsedContent);

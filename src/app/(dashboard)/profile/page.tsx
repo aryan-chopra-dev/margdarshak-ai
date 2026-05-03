@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { User, Mail, Phone, Calculator, Book, Save, ArrowLeft } from 'lucide-react';
+import { User, Mail, Phone, Calculator, Book, Save, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -23,21 +23,44 @@ export default function ProfilePage() {
   });
 
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    
-    // Save to Zustand store
-    setProfile(formData);
-    
-    // In the future this will sync to PostgreSQL via an API route
-    // await fetch('/api/profile', { method: 'POST', body: JSON.stringify(formData) });
-    
-    setTimeout(() => {
+    setSaveError('');
+    setSaveSuccess(false);
+
+    try {
+      // [FIX FM-1]: Profile save was a no-op (commented out API call).
+      // Now we persist to Supabase via the unified profile API.
+      const res = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, email: formData.email }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || data.message || 'Failed to save profile.');
+      }
+
+      // Sync Zustand store with the successfully persisted data
+      setProfile(formData);
+      setSaveSuccess(true);
+
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 800);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save profile. Please try again.';
+      setSaveError(message);
+      // Still update local store so UI reflects changes in this session
+      setProfile(formData);
+    } finally {
       setSaving(false);
-      router.push('/dashboard');
-    }, 500);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -136,6 +159,30 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* Save error banner */}
+        {saveError && (
+          <div style={{
+            padding: '12px 16px', borderRadius: 10,
+            background: 'rgba(239,68,68,0.08)', color: '#EF4444',
+            fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
+            border: '1px solid rgba(239,68,68,0.2)',
+          }}>
+            <AlertCircle size={15} /> {saveError}
+          </div>
+        )}
+
+        {/* Save success banner */}
+        {saveSuccess && (
+          <div style={{
+            padding: '12px 16px', borderRadius: 10,
+            background: 'rgba(16,185,129,0.08)', color: 'var(--success)',
+            fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
+            border: '1px solid rgba(16,185,129,0.2)',
+          }}>
+            <CheckCircle2 size={15} /> Profile saved successfully! Redirecting...
+          </div>
+        )}
 
         <button type="submit" className="btn-primary" disabled={saving} style={{ padding: 16, fontSize: 16, display: 'flex', justifyContent: 'center' }}>
           {saving ? 'Saving...' : <><Save size={18} /> Save Changes</>}

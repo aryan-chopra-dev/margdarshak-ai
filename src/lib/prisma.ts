@@ -1,11 +1,11 @@
-import { PrismaClient } from '@prisma/client'
+// ============================================================================
+// Prisma Client — DEPRECATED
+// ============================================================================
+// [FIX NEW-3]: All database operations have been unified on Supabase Postgres.
+// This file is retained only to avoid breaking any lingering import references.
+// No code in the application should import from this module.
+// The Prisma schema and SQLite dev.db can be safely removed in a future cleanup.
+// ============================================================================
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
-
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  datasourceUrl: 'file:./dev.db',
-})
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+// Intentionally empty — all DB access goes through @/lib/supabase now.
+export {};
