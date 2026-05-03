@@ -28,18 +28,30 @@ export default function LoanScorePage() {
   const lrsColor = lrs.score >= 700 ? '#10B981' : lrs.score >= 500 ? '#F59E0B' : '#EF4444';
   const lrsLabel = lrs.score >= 700 ? 'Pre-Approved' : lrs.score >= 500 ? 'Getting There' : 'Just Starting';
 
-  const handleFakeDocUpload = (docName: string) => {
-    if (!profile.docsUploaded.includes(docName)) {
-      setProfile({ docsUploaded: [...profile.docsUploaded, docName] });
+  const getUploadedKeys = () => {
+    if (!profile.docsUploaded) return [];
+    if (Array.isArray(profile.docsUploaded)) return profile.docsUploaded;
+    return Object.keys(profile.docsUploaded);
+  };
+  const uploadedKeys = getUploadedKeys();
+
+  const handleFakeDocUpload = (docKey: string) => {
+    if (!uploadedKeys.includes(docKey)) {
+      if (Array.isArray(profile.docsUploaded)) {
+        setProfile({ docsUploaded: [...profile.docsUploaded, docKey] });
+      } else {
+        // Mock the object shape for compatibility with the new profile page
+        setProfile({ docsUploaded: { ...profile.docsUploaded, [docKey]: { name: 'mock-upload.pdf', url: '#' } } as any });
+      }
       addIntentEvent(10);
     }
   };
 
   const docs = [
-    { name: 'Academic Transcript', uploaded: profile.docsUploaded.includes('transcript') },
-    { name: 'Passport Copy', uploaded: profile.docsUploaded.includes('passport') },
-    { name: 'Test Score Report', uploaded: profile.docsUploaded.includes('test-score') },
-    { name: 'Admit Letter', uploaded: profile.docsUploaded.includes('admit-letter') },
+    { key: 'transcript', name: 'Academic Transcript', uploaded: uploadedKeys.includes('transcript') },
+    { key: 'passport', name: 'Passport Copy', uploaded: uploadedKeys.includes('passport') },
+    { key: 'test_scores', name: 'Test Score Report', uploaded: uploadedKeys.includes('test_scores') || uploadedKeys.includes('test-score') },
+    { key: 'admit_letter', name: 'Admit Letter', uploaded: uploadedKeys.includes('admit_letter') || uploadedKeys.includes('admit-letter') },
   ];
 
   return (
@@ -184,7 +196,7 @@ export default function LoanScorePage() {
                   <span className="tag tag-success">✓ Uploaded</span>
                 ) : (
                   <button
-                    onClick={() => handleFakeDocUpload(d.name.toLowerCase().replace(/\s+/g, '-').replace('(','').replace(')',''))}
+                    onClick={() => handleFakeDocUpload(d.key)}
                     className="btn-secondary"
                     style={{ padding: '6px 14px', fontSize: 12 }}
                   >

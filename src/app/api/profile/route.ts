@@ -1,13 +1,25 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
+// Helper functions for mapping object keys
+function toSnakeCase(str: string) {
+  return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+}
+
+function toCamelCase(str: string) {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+function mapKeys(obj: any, mapper: (key: string) => string) {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return obj;
+  return Object.keys(obj).reduce((acc: any, key) => {
+    acc[mapper(key)] = obj[key];
+    return acc;
+  }, {});
+}
+
 // ============================================================================
 // Profile API — Unified on Supabase Postgres
-// ============================================================================
-// Previously this route used Prisma/SQLite while verify-otp used Supabase,
-// creating a split-brain where users created via OTP could never be found here.
-// Now fully unified: all profile reads/writes go through the same Supabase
-// 'profiles' table that verify-otp creates rows in. [FIX: NEW-3]
 // ============================================================================
 
 export async function POST(req: Request) {
@@ -19,21 +31,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    // Build the update payload — Supabase jsonb columns accept native arrays
+    // Convert camelCase keys from the client to snake_case for Supabase
+    const snakeUpdates = mapKeys(updates, toSnakeCase);
+
     const updatePayload: Record<string, unknown> = {
-      ...updates,
+      ...snakeUpdates,
       updated_at: new Date().toISOString(),
     };
 
-    // Ensure arrays are passed as-is (Supabase handles jsonb natively)
-    // but if they arrive as strings (legacy), parse them first
-    if (typeof updatePayload.shortlistedUniversities === 'string') {
-      try { updatePayload.shortlistedUniversities = JSON.parse(updatePayload.shortlistedUniversities as string); }
-      catch { updatePayload.shortlistedUniversities = []; }
+    // Parse legacy string arrays if necessary
+    if (typeof updatePayload.shortlisted_universities === 'string') {
+      try { updatePayload.shortlisted_universities = JSON.parse(updatePayload.shortlisted_universities as string); }
+      catch { updatePayload.shortlisted_universities = []; }
     }
-    if (typeof updatePayload.docsUploaded === 'string') {
-      try { updatePayload.docsUploaded = JSON.parse(updatePayload.docsUploaded as string); }
-      catch { updatePayload.docsUploaded = []; }
+    if (typeof updatePayload.docs_uploaded === 'string') {
+      try { updatePayload.docs_uploaded = JSON.parse(updatePayload.docs_uploaded as string); }
+      catch { updatePayload.docs_uploaded = []; }
     }
 
     const { data: profile, error } = await supabase
@@ -48,7 +61,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ status: 'error', message: 'Failed to update profile' }, { status: 500 });
     }
 
-    return NextResponse.json({ status: 'success', profile });
+    // Map the returned row back to camelCase for the client
+    const camelProfile = mapKeys(profile, toCamelCase);
+    return NextResponse.json({ status: 'success', profile: camelProfile });
 
   } catch (error) {
     console.error('Profile Update Error:', error);
@@ -72,7 +87,6 @@ export async function GET(req: Request) {
       .single();
 
     if (error || !profile) {
-      // PGRST116 = no rows found — treat as 404
       if (error?.code === 'PGRST116') {
         return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
       }
@@ -80,16 +94,18 @@ export async function GET(req: Request) {
       return NextResponse.json({ status: 'error', message: 'Failed to fetch profile' }, { status: 500 });
     }
 
-    // Supabase jsonb columns return native arrays — no manual JSON.parse needed.
-    // Normalise to arrays defensively in case of legacy string data.
+    // Map Supabase snake_case row back to camelCase for the client
+    const camelProfile = mapKeys(profile, toCamelCase);
+
+    // Defensively ensure arrays
     const parsedProfile = {
-      ...profile,
-      shortlistedUniversities: Array.isArray(profile.shortlistedUniversities)
-        ? profile.shortlistedUniversities
-        : (() => { try { return JSON.parse(profile.shortlistedUniversities || '[]'); } catch { return []; } })(),
-      docsUploaded: Array.isArray(profile.docsUploaded)
-        ? profile.docsUploaded
-        : (() => { try { return JSON.parse(profile.docsUploaded || '[]'); } catch { return []; } })(),
+      ...camelProfile,
+      shortlistedUniversities: Array.isArray(camelProfile.shortlistedUniversities)
+        ? camelProfile.shortlistedUniversities
+        : (() => { try { return JSON.parse(camelProfile.shortlistedUniversities || '[]'); } catch { return []; } })(),
+      docsUploaded: Array.isArray(camelProfile.docsUploaded)
+        ? camelProfile.docsUploaded
+        : (() => { try { return JSON.parse(camelProfile.docsUploaded || '[]'); } catch { return []; } })(),
     };
 
     return NextResponse.json({ status: 'success', profile: parsedProfile });
@@ -99,3 +115,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ status: 'error', message: 'Failed to fetch profile' }, { status: 500 });
   }
 }
+

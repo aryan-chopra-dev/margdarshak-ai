@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAppStore } from '@/lib/store';
+import { useAppStore, calculateLRS } from '@/lib/store';
 import { supabase } from '@/lib/supabase';
 import {
   User, Mail, Phone, Calculator, Book, Save, ArrowLeft,
@@ -41,7 +41,7 @@ const DOCUMENT_TYPES = [
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { profile, setProfile } = useAppStore();
+  const { profile, setProfile, intentScore } = useAppStore();
 
   const [formData, setFormData] = useState({
     name: profile.name || '',
@@ -173,10 +173,14 @@ export default function ProfilePage() {
     setSaveSuccess(false);
 
     try {
+      const fullProfileDraft = { ...profile, ...formData, docsUploaded: uploadedDocs as any };
+      const calculatedLrs = calculateLRS(fullProfileDraft, intentScore);
+
       const payload = {
         ...formData,
         email: formData.email,
         docsUploaded: uploadedDocs,
+        lrsScore: calculatedLrs.score,
       };
 
       const res = await fetch('/api/profile', {

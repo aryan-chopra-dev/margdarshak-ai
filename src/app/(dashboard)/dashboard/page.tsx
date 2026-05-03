@@ -20,6 +20,7 @@ const quickActions = [
 export default function DashboardPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [dbLeaderboard, setDbLeaderboard] = useState<{ name: string; score: number }[]>([]);
   const { profile, lrs, updateLRS, streakDays, intentScore, checkStreak, isOnboarded } = useAppStore();
 
   useEffect(() => {
@@ -35,6 +36,15 @@ export default function DashboardPage() {
     // Only run these once when dashboard mounts and user is onboarded
     updateLRS();
     checkStreak();
+
+    fetch('/api/leaderboard')
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          setDbLeaderboard(data.data.map((p: any) => ({ name: p.name, score: p.lrs_score })));
+        }
+      })
+      .catch(console.error);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOnboarded, mounted, router]);
 
@@ -50,6 +60,32 @@ export default function DashboardPage() {
   const circumference = 2 * Math.PI * 80;
   const pct = Math.max(0, ((lrs?.score || 300) - 300) / 550) * 100;
   const offset = circumference - (pct / 100) * circumference;
+
+  // --- Dynamic Leaderboard Logic ---
+  const userScore = lrs?.score || 300;
+  const currentName = profile?.name ? profile.name.split(' ')[0] : 'You';
+  
+  // Use strictly DB leaderboard
+  let peerScores = dbLeaderboard;
+
+  // Prevent duplicate of current user
+  peerScores = peerScores.filter(p => !p.name.includes(currentName) && p.name !== profile?.name);
+
+  const allUsers = [
+    ...peerScores.map(p => ({ ...p, isUser: false })),
+    { name: currentName, score: userScore, isUser: true }
+  ].sort((a, b) => b.score - a.score).map((u, index) => ({ ...u, rank: index + 1 }));
+
+  const userIndex = allUsers.findIndex(u => u.isUser);
+  const userRank = userIndex + 1;
+  const totalUsers = allUsers.length;
+
+  let startIndex = Math.max(0, userIndex - 1);
+  if (startIndex + 3 > allUsers.length) startIndex = Math.max(0, allUsers.length - 3);
+  const displayBoard = allUsers.slice(startIndex, startIndex + 3);
+  
+  const userRankPct = totalUsers > 1 ? Math.round((userRank / totalUsers) * 100) : 100;
+  // ---------------------------------
 
   return (
     <div className="page-container">
@@ -188,20 +224,23 @@ export default function DashboardPage() {
               <div>
                 <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: 'var(--text-secondary)' }}>LRS GLOBAL RANKING</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--bg-subtle)', borderRadius: 8, fontSize: 13 }}>
-                     <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>#143. Arjun K.</span>
-                     <span style={{ fontWeight: 700 }}>805 LRS</span>
-                   </div>
-                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--bg-subtle)', borderRadius: 8, fontSize: 13 }}>
-                     <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>#144. Neha P.</span>
-                     <span style={{ fontWeight: 700 }}>792 LRS</span>
-                   </div>
-                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--primary-bg)', border: '1px solid var(--primary-border)', borderRadius: 8, fontSize: 13 }}>
-                     <span style={{ fontWeight: 800, color: 'var(--primary)' }}>#145. {profile?.name || 'You'}</span>
-                     <span style={{ fontWeight: 800, color: 'var(--primary)' }}>{lrs?.score || 300} LRS</span>
-                   </div>
+                  {displayBoard.map((u, i) => (
+                    <div key={i} style={{
+                      display: 'flex', justifyContent: 'space-between', padding: '8px 12px',
+                      background: u.isUser ? 'var(--primary-bg)' : 'var(--bg-subtle)',
+                      border: u.isUser ? '1px solid var(--primary-border)' : '1px solid transparent',
+                      borderRadius: 8, fontSize: 13
+                    }}>
+                      <span style={{ fontWeight: u.isUser ? 800 : 600, color: u.isUser ? 'var(--primary)' : 'var(--text-muted)' }}>
+                        #{u.rank}. {u.name}
+                      </span>
+                      <span style={{ fontWeight: u.isUser ? 800 : 700, color: u.isUser ? 'var(--primary)' : 'var(--text)' }}>
+                        {u.score} LRS
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, textAlign: 'right' }}>Top 15% of all applicants</p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, textAlign: 'right' }}>Top {userRankPct}% of {totalUsers} applicant{totalUsers !== 1 ? 's' : ''}</p>
               </div>
             </div>
           </div>

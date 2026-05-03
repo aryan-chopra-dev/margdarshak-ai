@@ -98,7 +98,7 @@ const defaultProfile: UserProfile = {
   kycVerified: false,
 };
 
-function calculateLRS(profile: UserProfile, engagementSignal = 0): LRSState {
+export function calculateLRS(profile: UserProfile, engagementSignal = 0): LRSState {
   // Profile Completeness (25%)
   let profileScore = 0;
   if (profile.name) profileScore += 15;
@@ -111,7 +111,8 @@ function calculateLRS(profile: UserProfile, engagementSignal = 0): LRSState {
 
   // Document Readiness (25%)
   let docScore = 0;
-  const docCount = profile?.docsUploaded?.length || 0;
+  const docs = profile?.docsUploaded;
+  const docCount = Array.isArray(docs) ? docs.length : (docs ? Object.keys(docs).length : 0);
   docScore = Math.min(100, docCount * 25);
 
   // Co-applicant Details (20%)
