@@ -42,7 +42,7 @@ function validateStep(step: number, form: Record<string, unknown>): Errors {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { profile, setProfile, setOnboarded } = useAppStore();
+  const { profile, setProfile, setOnboarded, isOnboarded, onboardingDraft, setOnboardingDraft } = useAppStore();
   const [step, setStep] = useState(0);
   const [errors, setErrors] = useState<Errors>({});
   const [form, setForm] = useState({
@@ -53,14 +53,37 @@ export default function OnboardingPage() {
     parentName: '', parentPhone: '',
   });
 
-  // Pull name and email from Auth wall via Zustand persist store
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    setForm(f => ({ 
-      ...f, 
-      name: profile.name || f.name, 
-      email: profile.email || f.email 
-    }));
-  }, [profile.name, profile.email]);
+    setMounted(true);
+    if (isOnboarded) {
+      router.replace('/dashboard');
+      return;
+    }
+    
+    // Restore from draft if available, otherwise initialize from auth profile
+    if (onboardingDraft?.form) {
+      setStep(onboardingDraft.step);
+      setForm(onboardingDraft.form);
+    } else {
+      setForm(f => ({ 
+        ...f, 
+        name: profile?.name || f.name, 
+        email: profile?.email || f.email 
+      }));
+    }
+  }, [isOnboarded, onboardingDraft, profile?.name, profile?.email, router]);
+
+  // Auto-save progress whenever step or form changes
+  useEffect(() => {
+    if (mounted && !isOnboarded) {
+      setOnboardingDraft({ step, form });
+    }
+  }, [step, form, mounted, isOnboarded, setOnboardingDraft]);
+
+  if (!mounted) return <div style={{ minHeight: '100vh', background: 'var(--bg)' }} />;
+  if (isOnboarded) return <div style={{ minHeight: '100vh', background: 'var(--bg)' }} />;
 
   const update = (key: string, val: string | boolean) => {
     setForm(f => ({ ...f, [key]: val }));
@@ -110,6 +133,7 @@ export default function OnboardingPage() {
 
     setProfile(profileData);
     setOnboarded(true);
+    setOnboardingDraft(undefined); // Clear draft
     router.push('/dashboard');
   };
 

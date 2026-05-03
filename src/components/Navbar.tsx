@@ -23,7 +23,7 @@ const navItems = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { isOnboarded, profile } = useAppStore();
+  const { isOnboarded, profile, isAuthenticated } = useAppStore();
   const isPublic = pathname === '/' || pathname === '/login';
 
   return (
@@ -59,53 +59,32 @@ export default function Navbar() {
         </span>
       </Link>
 
-      {/* Nav Items */}
-      {!isPublic && isOnboarded && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 1,
-          overflow: 'auto', flex: 1, justifyContent: 'center', padding: '0 16px',
-        }}>
-          {navItems.map(item => {
-            const isActive = pathname === item.href;
-            return (
-              <Link key={item.href} href={item.href} style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                padding: '5px 10px', borderRadius: 8,
-                fontSize: 12.5, fontWeight: isActive ? 600 : 400,
-                color: isActive ? 'var(--primary)' : 'var(--text-muted)',
-                background: isActive ? 'var(--primary-bg)' : 'transparent',
-                textDecoration: 'none',
-                transition: 'color 0.15s, background 0.15s',
-                whiteSpace: 'nowrap',
-                letterSpacing: '0.01em',
-                borderBottom: isActive ? '2px solid var(--primary)' : '2px solid transparent',
-              }}
-              onMouseEnter={e => {
-                if (!isActive) {
-                  (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)';
-                  (e.currentTarget as HTMLElement).style.background = 'var(--bg-elevated)';
-                }
-              }}
-              onMouseLeave={e => {
-                if (!isActive) {
-                  (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
-                  (e.currentTarget as HTMLElement).style.background = 'transparent';
-                }
-              }}>
-                <item.icon size={13} />
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      {/* Desktop Links */}
+      <div style={{ display: 'flex', gap: 20 }}>
+        {navItems.map(item => {
+          const active = pathname.startsWith(item.href);
+          const Icon = item.icon;
+          return (
+            <Link key={item.label} href={item.href} style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              fontSize: 13, fontWeight: active ? 600 : 500,
+              color: active ? 'var(--primary)' : 'var(--text-secondary)',
+              textDecoration: 'none',
+              transition: 'color 0.2s',
+            }}>
+              <Icon size={14} style={{ opacity: active ? 1 : 0.6 }} />
+              {item.label}
+            </Link>
+          );
+        })}
+      </div>
 
-      {/* Right: CTA / User */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+      {/* Right Side */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <ThemeToggle />
-        {isOnboarded ? (
-          <>
-            {/* LRS Pill */}
+
+        {isAuthenticated ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 6,
               padding: '4px 12px 4px 8px',
@@ -119,18 +98,34 @@ export default function Navbar() {
             </div>
             {/* Avatar */}
             <Link href="/profile" style={{ textDecoration: 'none' }}>
-              <div style={{
+              <button style={{
                 width: 32, height: 32, borderRadius: '50%',
                 background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 13, fontWeight: 700, color: 'white',
                 cursor: 'pointer',
+                border: 'none',
                 boxShadow: '0 0 0 2px rgba(99,102,241,0.3)',
               }}>
                 {(profile?.name?.charAt(0)?.toUpperCase()) || 'U'}
-              </div>
+              </button>
             </Link>
-          </>
+            {/* Logout Button */}
+            <button 
+              onClick={async () => {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                useAppStore.getState().logout();
+                window.location.href = '/login';
+              }}
+              style={{
+                background: 'transparent', border: 'none', cursor: 'pointer',
+                fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)',
+                padding: '4px 8px'
+              }}
+            >
+              Logout
+            </button>
+          </div>
         ) : (
           <>
             <Link href="/login" style={{
@@ -140,7 +135,7 @@ export default function Navbar() {
             }}>
               Sign in
             </Link>
-            <Link href="/onboarding" className="btn-primary" style={{ padding: '7px 16px', fontSize: 13 }}>
+            <Link href="/login" className="btn-primary" style={{ padding: '7px 16px', fontSize: 13 }}>
               <Sparkles size={13} />
               Get Started
             </Link>

@@ -6,6 +6,17 @@ datasource db {
   provider = "sqlite"
 }
 
+model OtpVerification {
+  id        String   @id @default(uuid())
+  email     String
+  phone     String
+  otp       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([email, phone])
+}
+
 model Profile {
   id                      String   @id @default(uuid())
   email                   String   @unique

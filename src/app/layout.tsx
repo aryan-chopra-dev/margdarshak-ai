@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import ChatWidget from "@/components/ChatWidget";
 import AuthGuard from "@/components/AuthGuard";
 
 export const metadata: Metadata = {
@@ -29,17 +27,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
-        {/* Anti-flash theme script — must run before body renders */}
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <AuthGuard>
-          <Navbar />
-          <main>{children}</main>
-          <ChatWidget />
+          {children}
         </AuthGuard>
       </body>
     </html>

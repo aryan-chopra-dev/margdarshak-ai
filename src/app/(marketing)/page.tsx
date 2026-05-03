@@ -89,7 +89,7 @@ export default function LandingPage() {
             </p>
 
             <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 32 }}>
-              <Link href="/onboarding" className="btn-primary" style={{ padding: '13px 28px', fontSize: 15 }}>
+              <Link href="/login" className="btn-primary" style={{ padding: '13px 28px', fontSize: 15 }}>
                 Get Started Free <ArrowRight size={16} />
               </Link>
               <Link href="/career-navigator" className="btn-secondary" style={{ padding: '13px 28px', fontSize: 15 }}>
@@ -265,7 +265,7 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-            <Link href="/onboarding" className="btn-primary" style={{ padding: '12px 28px' }}>
+            <Link href="/login" className="btn-primary" style={{ padding: '12px 28px' }}>
               Check Your Eligibility <ArrowRight size={16} />
             </Link>
           </div>

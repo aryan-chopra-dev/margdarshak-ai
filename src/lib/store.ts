@@ -43,7 +43,8 @@ export interface LRSState {
 interface AppState {
   // Auth
   isAuthenticated: boolean;
-  login: (name: string, email: string) => void;
+  login: (name: string, email: string, phone: string) => void;
+  logout: () => void;
 
   // User
   profile: UserProfile;
@@ -102,7 +103,7 @@ function calculateLRS(profile: UserProfile): LRSState {
 
   // Document Readiness (25%)
   let docScore = 0;
-  const docCount = profile.docsUploaded.length;
+  const docCount = profile?.docsUploaded?.length || 0;
   docScore = Math.min(100, docCount * 25);
 
   // Co-applicant Details (20%)
@@ -114,8 +115,9 @@ function calculateLRS(profile: UserProfile): LRSState {
 
   // Shortlist (15%)
   let shortlistScore = 0;
-  if (profile.shortlistedUniversities.length > 0) shortlistScore = 50;
-  if (profile.shortlistedUniversities.length > 2) shortlistScore = 100;
+  const shortlistCount = profile?.shortlistedUniversities?.length || 0;
+  if (shortlistCount > 0) shortlistScore = 50;
+  if (shortlistCount > 2) shortlistScore = 100;
 
   // Compute total (Base 300, max 850)
   const total = 300 + 
@@ -139,12 +141,26 @@ function calculateLRS(profile: UserProfile): LRSState {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
+      isHydrated: false,
+      setHydrated: (val) => set({ isHydrated: val }),
+
+      onboardingDraft: undefined,
+      setOnboardingDraft: (draft) => set({ onboardingDraft: draft }),
+
       isAuthenticated: false,
-      login: (name: string, email: string) => set((state) => ({
+      login: (name: string, email: string, phone: string) => set((state) => ({
         isAuthenticated: true,
-        profile: { ...state.profile, name, email },
-        lrs: calculateLRS({ ...state.profile, name, email })
+        profile: { ...state.profile, name, email, phone },
+        lrs: calculateLRS({ ...state.profile, name, email, phone })
       })),
+      logout: () => set({
+        isAuthenticated: false,
+        profile: defaultProfile,
+        isOnboarded: false,
+        intentScore: 0,
+        streakDays: 0,
+        chatHistory: [],
+      }),
       
       profile: defaultProfile,
       isOnboarded: false,
@@ -219,6 +235,19 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'margdarshak-storage',
+      version: 2, // bump this whenever the stored schema changes
+      migrate: (persisted: unknown, fromVersion: number) => {
+        // On any schema change, clear auth so stale sessions don't crash the app
+        const state = persisted as Partial<AppState>;
+        if (fromVersion < 2) {
+          return {
+            ...state,
+            isAuthenticated: false,
+            isOnboarded: false,
+          };
+        }
+        return state;
+      },
       partialize: (state) => ({
         isAuthenticated: state.isAuthenticated,
         profile: state.profile,
@@ -227,7 +256,13 @@ export const useAppStore = create<AppState>()(
         chatHistory: state.chatHistory,
         streakDays: state.streakDays,
         theme: state.theme,
-      })
+        onboardingDraft: state.onboardingDraft,
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHydrated(true);
+        }
+      }
     }
   )
 );
