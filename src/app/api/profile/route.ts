@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { calculateLRS, UserProfile } from '@/lib/store';
 
 // Helper functions for mapping object keys
 function toSnakeCase(str: string) {
@@ -33,6 +34,42 @@ export async function POST(req: Request) {
 
     // Convert camelCase keys from the client to snake_case for Supabase
     const snakeUpdates = mapKeys(updates, toSnakeCase);
+
+    // SECURE LRS CALCULATION (Server-Side)
+    // 1. Fetch existing profile to compute LRS accurately against all fields
+    const { data: existingProfile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+       console.warn('Failed to fetch existing profile for LRS calculation, falling back to updates only', fetchError);
+    }
+
+    // 2. Merge existing DB data with new incoming updates
+    const mergedSnakeProfile = { ...(existingProfile || {}), ...snakeUpdates, email };
+
+    // 3. Normalize JSONB arrays for the calculation engine
+    const parseJsonbArray = (val: any) => {
+      if (Array.isArray(val)) return val;
+      if (typeof val === 'string') {
+        try { return JSON.parse(val); } catch { return []; }
+      }
+      return [];
+    };
+
+    // 4. Map to UserProfile format expected by calculateLRS
+    const camelMergedProfile = mapKeys(mergedSnakeProfile, toCamelCase) as UserProfile;
+    camelMergedProfile.shortlistedUniversities = parseJsonbArray(camelMergedProfile.shortlistedUniversities);
+    camelMergedProfile.docsUploaded = parseJsonbArray(camelMergedProfile.docsUploaded);
+
+    // 5. Calculate the TRUE score dynamically based on the verified backend state
+    const intent = Number(mergedSnakeProfile.intent_score) || 0;
+    const trueLrs = calculateLRS(camelMergedProfile, intent);
+
+    // 6. Hard override the lrs_score from the client to prevent manipulation vulnerabilities
+    snakeUpdates.lrs_score = trueLrs.score;
 
     const updatePayload: Record<string, unknown> = {
       ...snakeUpdates,

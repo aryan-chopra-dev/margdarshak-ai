@@ -36,6 +36,29 @@ function validateStep(step: number, form: Record<string, unknown>): Errors {
     const gpa = parseFloat(form.gpa as string);
     if (!form.gpa || isNaN(gpa) || gpa < 1 || gpa > 10)
       errs.gpa = 'Enter a valid GPA between 1.0 and 10.0';
+    
+    if (form.workExperience) {
+      const we = parseInt(form.workExperience as string);
+      if (isNaN(we) || we < 0 || we > 30) errs.workExperience = 'Work experience must be 0-30';
+    }
+    if (form.greScore) {
+      const gre = parseInt(form.greScore as string);
+      if (isNaN(gre) || gre < 260 || gre > 340) errs.greScore = 'GRE must be between 260-340';
+    }
+    if (form.toeflScore) {
+      const toefl = parseInt(form.toeflScore as string);
+      if (isNaN(toefl) || toefl < 0 || toefl > 120) errs.toeflScore = 'TOEFL must be between 0-120';
+    }
+    if (form.ieltsScore) {
+      const ielts = parseFloat(form.ieltsScore as string);
+      if (isNaN(ielts) || ielts < 0 || ielts > 9) errs.ieltsScore = 'IELTS must be between 0-9.0';
+    }
+  }
+  if (step === 3) {
+    if (form.budget) {
+      const budget = parseInt(form.budget as string);
+      if (isNaN(budget) || budget < 0) errs.budget = 'Budget must be a positive number';
+    }
   }
   return errs;
 }
@@ -199,24 +222,24 @@ export default function OnboardingPage() {
                 min="0" max="10" placeholder="8.5"
                 value={form.gpa} onChange={e => update('gpa', e.target.value)} />
             </Field>
-            <Field label="Work Experience (years)">
-              <input className="input-field" type="number" min="0" max="20" placeholder="0"
+            <Field label="Work Experience (years)" error={errors.workExperience}>
+              <input className={`input-field ${errors.workExperience ? 'error' : ''}`} type="number" min="0" max="30" placeholder="0"
                 value={form.workExperience} onChange={e => update('workExperience', e.target.value)} />
             </Field>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <Field label="GRE Score (260–340)">
-              <input className="input-field" type="number" min="260" max="340" placeholder="Optional"
+            <Field label="GRE Score (260–340)" error={errors.greScore}>
+              <input className={`input-field ${errors.greScore ? 'error' : ''}`} type="number" min="260" max="340" placeholder="Optional"
                 value={form.greScore} onChange={e => update('greScore', e.target.value)} />
             </Field>
-            <Field label="TOEFL (0–120)">
-              <input className="input-field" type="number" min="0" max="120" placeholder="Optional"
+            <Field label="TOEFL (0–120)" error={errors.toeflScore}>
+              <input className={`input-field ${errors.toeflScore ? 'error' : ''}`} type="number" min="0" max="120" placeholder="Optional"
                 value={form.toeflScore} onChange={e => update('toeflScore', e.target.value)} />
             </Field>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <Field label="IELTS (0–9)">
-              <input className="input-field" type="number" step="0.5" min="0" max="9" placeholder="Optional"
+            <Field label="IELTS (0–9)" error={errors.ieltsScore}>
+              <input className={`input-field ${errors.ieltsScore ? 'error' : ''}`} type="number" step="0.5" min="0" max="9" placeholder="Optional"
                 value={form.ieltsScore} onChange={e => update('ieltsScore', e.target.value)} />
             </Field>
             <div style={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -244,8 +267,8 @@ export default function OnboardingPage() {
       icon: Calculator,
       content: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <Field label="Total Budget (₹ per year)">
-            <input className="input-field" type="number" min="0" placeholder="e.g. 3000000"
+          <Field label="Total Budget (₹ per year)" error={errors.budget}>
+            <input className={`input-field ${errors.budget ? 'error' : ''}`} type="number" min="0" placeholder="e.g. 3000000"
               value={form.budget} onChange={e => update('budget', e.target.value)} />
           </Field>
           <Field label="Parent / Co-applicant Name">

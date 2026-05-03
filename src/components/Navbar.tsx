@@ -1,4 +1,5 @@
 'use client';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { usePathname } from 'next/navigation';
@@ -23,8 +24,19 @@ const navItems = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { isOnboarded, profile, isAuthenticated } = useAppStore();
+  const { isOnboarded, profile, isAuthenticated, lrs } = useAppStore();
   const isPublic = pathname === '/' || pathname === '/login';
+
+  useEffect(() => {
+    if (isAuthenticated && profile?.email && lrs?.score) {
+      // Silently sync LRS score to Supabase whenever it changes (e.g. from engagement gamification)
+      fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: profile.email, lrsScore: lrs.score })
+      }).catch(console.error);
+    }
+  }, [lrs?.score, isAuthenticated, profile?.email]);
 
   return (
     <nav style={{
