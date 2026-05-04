@@ -286,7 +286,7 @@ export default function OnboardingPage() {
             <input className="input-field" placeholder="Optional"
               value={form.parentName} onChange={e => update('parentName', e.target.value)} />
           </Field>
-          <Field label="Parent Phone">
+          <Field label="Parent Phone" error={errors.parentPhone}>
             <input className="input-field" type="tel" placeholder="Optional"
               value={form.parentPhone} onChange={e => update('parentPhone', e.target.value)} />
           </Field>
