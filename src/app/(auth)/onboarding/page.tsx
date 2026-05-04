@@ -57,7 +57,18 @@ function validateStep(step: number, form: Record<string, unknown>): Errors {
   if (step === 3) {
     if (form.budget) {
       const budget = parseInt(form.budget as string);
-      if (isNaN(budget) || budget < 0) errs.budget = 'Budget must be a positive number';
+      if (isNaN(budget) || budget <= 0) {
+        errs.budget = 'Budget must be greater than 0';
+      } else if (budget < 100000) {
+        errs.budget = 'Budget seems too low (min ₹1,00,000/year)';
+      }
+    }
+
+    if (form.parentPhone) {
+      const phone = form.parentPhone as string;
+      if (!/^[6-9]\d{9}$/.test(phone)) {
+        errs.parentPhone = 'Enter a valid 10-digit Indian phone number';
+      }
     }
   }
   return errs;
