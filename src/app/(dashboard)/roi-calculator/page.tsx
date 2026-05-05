@@ -11,6 +11,35 @@ import {
 
 const USD_TO_INR = 83;
 
+// --- Financial Math Helpers ---
+function calculateIRR(cashFlows: number[], guess = 0.1): number {
+  const maxTries = 100;
+  let rate = guess;
+  for (let i = 0; i < maxTries; i++) {
+    let npv = 0;
+    let dNpv = 0;
+    for (let t = 0; t < cashFlows.length; t++) {
+      npv += cashFlows[t] / Math.pow(1 + rate, t);
+      if (t > 0) dNpv -= (t * cashFlows[t]) / Math.pow(1 + rate, t + 1);
+    }
+    if (Math.abs(npv) < 1e-5) return rate;
+    const newRate = rate - npv / dNpv;
+    if (Math.abs(newRate - rate) < 1e-5) return newRate;
+    rate = newRate;
+  }
+  return rate;
+}
+
+function calculateNPV(rate: number, cashFlows: number[]): number {
+  return cashFlows.reduce((npv, cf, t) => npv + cf / Math.pow(1 + rate, t), 0);
+}
+
+const SCENARIOS = {
+  optimistic: { name: 'Optimistic', salaryGrowthMult: 1.2, taxUS: 0.25, taxIN: 0.15, inflation: 0.02, discountRate: 0.08 },
+  realistic:  { name: 'Realistic', salaryGrowthMult: 1.0, taxUS: 0.30, taxIN: 0.20, inflation: 0.03, discountRate: 0.10 },
+  conservative: { name: 'Conservative', salaryGrowthMult: 0.7, taxUS: 0.35, taxIN: 0.25, inflation: 0.04, discountRate: 0.12 },
+};
+
 export default function ROICalculatorPage() {
   const { profile } = useAppStore();
   const [selectedUni, setSelectedUni] = useState(profile.shortlistedUniversities?.[0] || 'mit');
@@ -18,6 +47,9 @@ export default function ROICalculatorPage() {
   const [loanRate, setLoanRate] = useState(11.25);
   const [loanTenure, setLoanTenure] = useState(10);
   const [scholarshipPct, setScholarshipPct] = useState(0);
+  const [scenarioKey, setScenarioKey] = useState<keyof typeof SCENARIOS>('realistic');
+
+  const scenario = SCENARIOS[scenarioKey];
 
   const uni = universities.find(u => u.id === selectedUni) || universities[0];
   const country = uni.country;
@@ -43,26 +75,51 @@ export default function ROICalculatorPage() {
   // Loan EMI
   const emi = calculateEMI(totalCostINR, loanRate, loanTenure);
 
-  // [FIX FM-9]: Dynamic pre-degree baseline from PLFS data, keyed on work experience.
-  // Previously hardcoded at $4,820 for ALL users regardless of seniority.
+  // Pre-degree baseline from PLFS data, keyed on work experience.
   const preDegree =
     profile.workExperience >= 3 ? indianBaselineSalary.withExperience3to5 :
     profile.workExperience >= 1 ? indianBaselineSalary.withExperience1to3 :
-    indianBaselineSalary.freshGraduate; // $4,820 only for fresh graduates
+    indianBaselineSalary.freshGraduate;
 
-  const postDegreeEntry = salary.entryLevelUSD;
-  const postDegreeMid = salary.midCareerUSD;
-  const postDegreeSenior = salary.seniorLevelUSD;
+  const postDegreeEntry = salary.entryLevelUSD * scenario.salaryGrowthMult;
+  const postDegreeMid = salary.midCareerUSD * scenario.salaryGrowthMult;
+  const postDegreeSenior = salary.seniorLevelUSD * scenario.salaryGrowthMult;
 
-  // [FIX FM-2]: ROI now correctly accounts for total loan cost (principal + interest).
-  // Previously emi.totalInterest was ignored, making the loan sliders mathematical placebos.
-  const totalInterestUSD = emi.totalInterest / USD_TO_INR; // convert INR back to USD basis
-  const totalCostWithInterest = afterScholarship + totalInterestUSD;
+  // Generate 10-Year Unlevered Cash Flows for Project IRR
+  const cashFlows: number[] = [];
+  let cumulativeUnlevered = 0;
+  let breakEvenYears = -1;
 
-  // 10-year earnings gain over staying in India without the degree
-  const earningsGain10yr = (postDegreeEntry * 3 + postDegreeMid * 5 + postDegreeSenior * 2) - (preDegree * 10);
-  const roi = ((earningsGain10yr - totalCostWithInterest) / totalCostWithInterest * 100);
-  const breakEvenYears = totalCostWithInterest / Math.max(1, postDegreeEntry - preDegree);
+  for (let t = 0; t < programYears + 10; t++) {
+    let cf = 0;
+    // Pre-degree trajectory (Opportunity cost)
+    const preDegreeGrowth = 0.08 * scenario.salaryGrowthMult;
+    const currentPreDegree = preDegree * Math.pow(1 + preDegreeGrowth, t);
+    const preDegreeNet = currentPreDegree * (1 - scenario.taxIN);
+
+    if (t < programYears) {
+      // During study years: Outflow is Net Tuition + Lost Wages (Net)
+      cf = -preDegreeNet - (afterScholarship / programYears);
+    } else {
+      // Working years
+      const workYear = t - programYears;
+      let currentSalary = postDegreeEntry * Math.pow(1 + (salary.annualGrowthPct / 100) * scenario.salaryGrowthMult, workYear);
+      if (currentSalary > postDegreeSenior) currentSalary = postDegreeSenior;
+
+      const postDegreeNet = currentSalary * (1 - scenario.taxUS);
+      cf = postDegreeNet - preDegreeNet;
+    }
+
+    cashFlows.push(cf);
+    cumulativeUnlevered += cf;
+    if (breakEvenYears === -1 && cumulativeUnlevered > 0) {
+      const prev = cumulativeUnlevered - cf;
+      breakEvenYears = t - 1 + Math.abs(prev) / cf;
+    }
+  }
+
+  const irr = calculateIRR(cashFlows) * 100;
+  const npv = calculateNPV(scenario.discountRate, cashFlows);
 
   return (
     <div className="page-container">
@@ -78,6 +135,31 @@ export default function ROICalculatorPage() {
           <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Configure</h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <div>
+              <label className="input-label">Economic Scenario</label>
+              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                {(Object.keys(SCENARIOS) as Array<keyof typeof SCENARIOS>).map(key => (
+                  <button
+                    key={key}
+                    onClick={() => setScenarioKey(key)}
+                    style={{
+                      flex: 1,
+                      padding: '8px 4px',
+                      fontSize: 12,
+                      fontWeight: scenarioKey === key ? 700 : 500,
+                      borderRadius: 'var(--radius-md)',
+                      border: scenarioKey === key ? '1px solid var(--primary)' : '1px solid var(--border)',
+                      background: scenarioKey === key ? 'var(--primary-bg)' : 'transparent',
+                      color: scenarioKey === key ? 'var(--primary)' : 'var(--text-muted)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {SCENARIOS[key].name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div>
               <label className="input-label">University</label>
               <select className="input-field" value={selectedUni} onChange={e => setSelectedUni(e.target.value)}>
@@ -128,10 +210,24 @@ export default function ROICalculatorPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
             <MetricCard
               icon={IndianRupee}
-              label="Total Education Cost"
+              label="Total Net Cost"
               value={`₹${Math.round(afterScholarship * USD_TO_INR).toLocaleString('en-IN')}`}
               sub={`Approx. ₹${Math.round(totalCostINR / 100000).toLocaleString('en-IN')} Lakhs`}
               color="#6C3CE1"
+            />
+            <MetricCard
+              icon={TrendingUp}
+              label="Net Present Value (NPV)"
+              value={`$${Math.round(npv).toLocaleString()}`}
+              sub={`Discounted at ${scenario.discountRate * 100}%`}
+              color={npv > 0 ? '#10B981' : '#EF4444'}
+            />
+            <MetricCard
+              icon={BarChart3}
+              label="10-Year Project IRR"
+              value={`${irr.toFixed(1)}%`}
+              sub={breakEvenYears > 0 ? `Payback: ${breakEvenYears.toFixed(1)} years` : `No Payback in 10yrs`}
+              color={irr > 0 ? '#10B981' : '#EF4444'}
             />
             <MetricCard
               icon={IndianRupee}
@@ -139,20 +235,6 @@ export default function ROICalculatorPage() {
               value={`₹${emi.emi.toLocaleString('en-IN')}`}
               sub={`${loanTenure}yr at ${loanRate}% p.a.`}
               color="#0EA5E9"
-            />
-            <MetricCard
-              icon={TrendingUp}
-              label="10-Year ROI"
-              value={`${roi.toFixed(0)}%`}
-              sub={`Break-even: ${breakEvenYears.toFixed(1)} years`}
-              color={roi > 0 ? '#10B981' : '#EF4444'}
-            />
-            <MetricCard
-              icon={BarChart3}
-              label="Salary Multiplier"
-              value={`${(postDegreeMid / preDegree).toFixed(1)}×`}
-              sub={`₹${Math.round(preDegree * USD_TO_INR / 100000)}L → ₹${Math.round(postDegreeMid * USD_TO_INR / 100000)}L`}
-              color="#F59E0B"
             />
           </div>
 
