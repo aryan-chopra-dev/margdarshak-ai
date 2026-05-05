@@ -81,29 +81,37 @@ export default function ROICalculatorPage() {
     profile.workExperience >= 1 ? indianBaselineSalary.withExperience1to3 :
     indianBaselineSalary.freshGraduate;
 
-  const postDegreeEntry = salary.entryLevelUSD * scenario.salaryGrowthMult;
-  const postDegreeMid = salary.midCareerUSD * scenario.salaryGrowthMult;
-  const postDegreeSenior = salary.seniorLevelUSD * scenario.salaryGrowthMult;
+  // Starting salaries come directly from BLS/HESA/NIRF data — scenario adjusts
+  // the *growth trajectory*, not the entry point (which would double-count).
+  const postDegreeEntry = salary.entryLevelUSD;     // BLS data as-is
+  const postDegreeMid = salary.midCareerUSD;         // BLS median
+  const postDegreeSenior = salary.seniorLevelUSD;    // BLS 75th percentile (salary cap)
 
   // Generate 10-Year Unlevered Cash Flows for Project IRR
+  // All values in USD (salaries from BLS/NIRF are USD-denominated).
+  const INDIA_SALARY_GROWTH_RATE = 0.07; // PLFS-based: ~7% annual growth for urban graduates
   const cashFlows: number[] = [];
   let cumulativeUnlevered = 0;
   let breakEvenYears = -1;
 
   for (let t = 0; t < programYears + 10; t++) {
     let cf = 0;
-    // Pre-degree trajectory (Opportunity cost)
-    const preDegreeGrowth = 0.08 * scenario.salaryGrowthMult;
-    const currentPreDegree = preDegree * Math.pow(1 + preDegreeGrowth, t);
+    // Opportunity cost: what the student would have earned in India without the degree.
+    // Growth rate is fixed at Indian market rate, independent of the abroad scenario.
+    const currentPreDegree = preDegree * Math.pow(1 + INDIA_SALARY_GROWTH_RATE, t);
     const preDegreeNet = currentPreDegree * (1 - scenario.taxIN);
 
     if (t < programYears) {
-      // During study years: Outflow is Net Tuition + Lost Wages (Net)
+      // During study years: Outflow = Tuition (net of scholarship) + Lost Wages (Net)
       cf = -preDegreeNet - (afterScholarship / programYears);
     } else {
-      // Working years
+      // Working years: scenario multiplier scales growth rate only, not starting salary
       const workYear = t - programYears;
-      let currentSalary = postDegreeEntry * Math.pow(1 + (salary.annualGrowthPct / 100) * scenario.salaryGrowthMult, workYear);
+      let currentSalary = postDegreeEntry * Math.pow(
+        1 + (salary.annualGrowthPct / 100) * scenario.salaryGrowthMult,
+        workYear
+      );
+      // Cap at the BLS 75th percentile (senior-level), adjusted for scenario
       if (currentSalary > postDegreeSenior) currentSalary = postDegreeSenior;
 
       const postDegreeNet = currentSalary * (1 - scenario.taxUS);
@@ -114,12 +122,14 @@ export default function ROICalculatorPage() {
     cumulativeUnlevered += cf;
     if (breakEvenYears === -1 && cumulativeUnlevered > 0) {
       const prev = cumulativeUnlevered - cf;
-      breakEvenYears = t - 1 + Math.abs(prev) / cf;
+      // Clamp to avoid negative break-even on edge cases (e.g., t=0)
+      breakEvenYears = Math.max(0, t - 1 + Math.abs(prev) / Math.max(cf, 1));
     }
   }
 
   const irr = calculateIRR(cashFlows) * 100;
-  const npv = calculateNPV(scenario.discountRate, cashFlows);
+  // Convert NPV to INR for consistent display with the rest of the UI
+  const npvINR = calculateNPV(scenario.discountRate, cashFlows) * USD_TO_INR;
 
   return (
     <div className="page-container">
@@ -218,15 +228,15 @@ export default function ROICalculatorPage() {
             <MetricCard
               icon={TrendingUp}
               label="Net Present Value (NPV)"
-              value={`$${Math.round(npv).toLocaleString()}`}
-              sub={`Discounted at ${scenario.discountRate * 100}%`}
-              color={npv > 0 ? '#10B981' : '#EF4444'}
+              value={`₹${Math.round(Math.abs(npvINR)).toLocaleString('en-IN')}`}
+              sub={npvINR >= 0 ? `Positive at ${scenario.discountRate * 100}% discount` : `Negative at ${scenario.discountRate * 100}% discount`}
+              color={npvINR > 0 ? '#10B981' : '#EF4444'}
             />
             <MetricCard
               icon={BarChart3}
               label="10-Year Project IRR"
               value={`${irr.toFixed(1)}%`}
-              sub={breakEvenYears > 0 ? `Payback: ${breakEvenYears.toFixed(1)} years` : `No Payback in 10yrs`}
+              sub={breakEvenYears > 0 ? `Payback: ${breakEvenYears.toFixed(1)} years` : `No payback in ${programYears + 10}yr window`}
               color={irr > 0 ? '#10B981' : '#EF4444'}
             />
             <MetricCard
@@ -267,13 +277,16 @@ export default function ROICalculatorPage() {
 
           {/* Salary Trajectory */}
           <div className="card-static" style={{ padding: 28 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Salary Trajectory ({salary.dataSource})</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>Salary Trajectory ({salary.dataSource})</h3>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
+              Pre-degree reflects Indian market (INR). Post-degree reflects {country} market — subject to higher local living costs.
+            </p>
             <div style={{ display: 'flex', gap: 16 }}>
               {[
-                { label: 'Pre-Degree (India)', salary: preDegree, phase: 'Before' },
-                { label: 'Entry Level (0-2yr)', salary: postDegreeEntry, phase: 'After', growth: ((postDegreeEntry / preDegree - 1) * 100).toFixed(0) + '%' },
-                { label: 'Mid-Career (5-8yr)', salary: postDegreeMid, phase: 'After' },
-                { label: 'Senior (10-15yr)', salary: postDegreeSenior, phase: 'After' },
+                { label: 'Pre-Degree', sublabel: '🇮🇳 India', salary: preDegree, phase: 'Before' },
+                { label: 'Entry Level (0–2yr)', sublabel: `🌍 ${country}`, salary: postDegreeEntry, phase: 'After', growth: ((postDegreeEntry / preDegree - 1) * 100).toFixed(0) + '%' },
+                { label: 'Mid-Career (5–8yr)', sublabel: `🌍 ${country}`, salary: postDegreeMid, phase: 'After' },
+                { label: 'Senior (10–15yr)', sublabel: `🌍 ${country}`, salary: postDegreeSenior, phase: 'After' },
               ].map((item, i) => (
                 <div key={i} style={{
                   flex: 1, padding: 16, borderRadius: 'var(--radius-md)',
@@ -281,16 +294,17 @@ export default function ROICalculatorPage() {
                   border: i > 0 ? '1px solid var(--primary-border)' : 'none',
                   textAlign: 'center',
                 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>{item.label}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 2, textTransform: 'uppercase' }}>{item.label}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 6 }}>{item.sublabel}</div>
                   <div style={{ fontSize: 22, fontWeight: 900, color: i > 0 ? 'var(--primary)' : 'var(--text)' }}>
-                    ₹{Math.round(item.salary * USD_TO_INR).toLocaleString('en-IN')}
+                    {i === 0 ? `₹${Math.round(item.salary * USD_TO_INR).toLocaleString('en-IN')}` : `$${Math.round(item.salary).toLocaleString()}`}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    ₹{Math.round(item.salary * USD_TO_INR / 100000).toLocaleString('en-IN')} LPA
+                    {i === 0 ? `₹${Math.round(item.salary * USD_TO_INR / 100000).toLocaleString('en-IN')} LPA` : `USD/yr`}
                   </div>
                   {item.growth && (
                     <div style={{ fontSize: 11, color: 'var(--success)', fontWeight: 700, marginTop: 4 }}>
-                      +{item.growth} increase
+                      +{item.growth} vs pre-degree
                     </div>
                   )}
                 </div>

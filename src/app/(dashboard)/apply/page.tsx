@@ -3,15 +3,16 @@ import { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
 import { loanProducts, calculateEMI } from '@/data/loans';
 import { universities } from '@/data/universities';
+import Link from 'next/link';
 import {
   FileCheck, Upload, CheckCircle2, ArrowRight, Shield,
-  Sparkles, Clock, Zap
+  Sparkles, Clock, Zap, CreditCard, Building2, Calendar, IndianRupee
 } from 'lucide-react';
 
 const steps = ['Upload Document', 'Verify Details', 'Choose Lender', 'Submit'];
 
 export default function ApplyPage() {
-  const { profile, lrs, addIntentEvent } = useAppStore();
+  const { profile, lrs, addIntentEvent, setLoanApplication, loanApplication } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedLender, setSelectedLender] = useState('poonawala');
   const [submitted, setSubmitted] = useState(false);
@@ -23,7 +24,14 @@ export default function ApplyPage() {
 
   const topUni = universities.find(u => profile.shortlistedUniversities?.includes(u.id)) || universities[0];
   const USD_TO_INR = 83;
-  const loanAmount = topUni.tuitionUSD * 2 * USD_TO_INR;
+  const uniCountry = topUni.country;
+  const livingCostPerYear = uniCountry === 'United States' ? 20000 :
+    uniCountry === 'United Kingdom' ? 18000 :
+    uniCountry === 'Canada' ? 15000 :
+    uniCountry === 'Germany' ? 12000 :
+    uniCountry === 'India' ? 3000 : 16000;
+  const programYears = uniCountry === 'United Kingdom' ? 1 : 2;
+  const loanAmount = (topUni.tuitionUSD + livingCostPerYear) * programYears * USD_TO_INR;
 
   const [formData, setFormData] = useState({
     name: '', email: '', university: '', course: '', tuition: '', gpa: ''
@@ -91,20 +99,129 @@ export default function ApplyPage() {
     }
   };
 
-  if (submitted) {
+  const lender = loanProducts.find(l => l.id === selectedLender) || loanProducts[0];
+
+  const handleSubmit = () => {
+    const refId = 'PF-' + Math.floor(1000 + Math.random() * 9000) + '-' + Math.floor(100 + Math.random() * 900);
+    setLoanApplication({
+      submitted: true,
+      lenderId: selectedLender,
+      lenderName: lender.lender,
+      universityName: formData.university || topUni.name,
+      principalINR: loanAmount,
+      submittedAt: new Date().toISOString(),
+      referenceId: refId,
+    });
+    setSubmitted(true);
+    addIntentEvent(30);
+  };
+
+  // --- Rehydrate from store if already submitted ---
+  useEffect(() => {
+    if (loanApplication?.submitted) setSubmitted(true);
+  }, [loanApplication]);
+
+  if (submitted && loanApplication) {
+    const emiData = calculateEMI(loanApplication.principalINR, lender.interestRateMin, lender.maxTenureYears);
+    const submittedDate = new Date(loanApplication.submittedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
     return (
-      <div className="page-container" style={{ textAlign: 'center', paddingTop: 180 }}>
-        <div style={{
-          width: 80, height: 80, borderRadius: '50%', margin: '0 auto 24px',
-          background: 'var(--success-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <CheckCircle2 size={40} color="var(--success)" />
-        </div>
-        <h1 style={{ fontSize: 36, fontWeight: 900, marginBottom: 12 }}>Application Submitted! 🎉</h1>
-        <p style={{ fontSize: 18, color: 'var(--text-secondary)', maxWidth: 500, margin: '0 auto 32px' }}>
-          Your loan application has been submitted to {loanProducts.find(l => l.id === selectedLender)?.lender}.
-          You will receive a confirmation call within 24 hours.
+      <div className="page-container">
+        <div className="section-label"><CheckCircle2 size={14} /> Application Submitted</div>
+        <h1 className="page-title">Loan Application Active 🎉</h1>
+        <p className="page-subtitle" style={{ marginBottom: 32 }}>
+          Your application has been submitted to <strong>{loanApplication.lenderName}</strong>. Expect a confirmation call within 24 hours.
         </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 24, alignItems: 'flex-start' }}>
+          {/* Left: Loan Details */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* Hero sanctioned card */}
+            <div className="card-static" style={{
+              padding: 32, background: 'var(--primary)',
+              backgroundImage: 'linear-gradient(135deg, var(--primary) 0%, #4338CA 100%)', color: 'white'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <span style={{ fontSize: 12, fontWeight: 700, padding: '4px 10px', background: 'rgba(255,255,255,0.2)', borderRadius: 20 }}>
+                    🟢 Pending Sanction
+                  </span>
+                  <h2 style={{ fontSize: 22, fontWeight: 800, marginTop: 16 }}>Ref: #{loanApplication.referenceId}</h2>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, opacity: 0.9, fontSize: 14 }}>
+                    <Building2 size={15} /> {loanApplication.universityName}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 12, opacity: 0.8 }}>Applied Amount</div>
+                  <div style={{ fontSize: 30, fontWeight: 900 }}>₹{(loanApplication.principalINR / 100000).toFixed(1)}L</div>
+                  <div style={{ fontSize: 11, opacity: 0.7 }}>{loanApplication.lenderName}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Key Loan Metrics */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+              {[
+                { icon: IndianRupee, label: 'Loan Principal', value: `₹${(loanApplication.principalINR / 100000).toFixed(1)} Lakhs`, color: '#6C3CE1' },
+                { icon: CreditCard, label: 'Est. Monthly EMI', value: `₹${emiData.emi.toLocaleString('en-IN')}`, color: '#10B981' },
+                { icon: Calendar, label: 'Applied On', value: submittedDate, color: '#0EA5E9' },
+              ].map((item, i) => (
+                <div key={i} className="card-static" style={{ padding: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: `${item.color}14`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <item.icon size={16} color={item.color} />
+                    </div>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)' }}>{item.label}</span>
+                  </div>
+                  <div style={{ fontSize: 22, fontWeight: 900 }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* EMI Breakdown */}
+            <div className="card-static" style={{ padding: 24 }}>
+              <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Loan Summary — {loanApplication.lenderName}</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+                {[
+                  { label: 'Principal', value: `₹${(loanApplication.principalINR / 100000).toFixed(1)} L` },
+                  { label: 'Interest Rate', value: `${lender.interestRateMin}% p.a.` },
+                  { label: 'Tenure', value: `${lender.maxTenureYears} years` },
+                  { label: 'Total Payable', value: `₹${(emiData.totalPayment / 100000).toFixed(1)} L` },
+                  { label: 'Total Interest', value: `₹${(emiData.totalInterest / 100000).toFixed(1)} L` },
+                  { label: 'Moratorium', value: `${lender.moratoriumMonths} months` },
+                ].map((item, i) => (
+                  <div key={i} style={{ padding: '12px 16px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>{item.label}</div>
+                    <div style={{ fontSize: 17, fontWeight: 800 }}>{item.value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: CTAs */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'sticky', top: 88 }}>
+            <div className="card-static" style={{ padding: 24 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Next Steps</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <Link href="/repayment" className="btn-primary" style={{ width: '100%', padding: '14px', textAlign: 'center' }}>
+                  <CreditCard size={16} /> View Repayment Dashboard <ArrowRight size={14} />
+                </Link>
+                <Link href="/parent-report" className="btn-secondary" style={{ width: '100%', padding: '12px', textAlign: 'center' }}>
+                  Generate Parent Report <ArrowRight size={14} />
+                </Link>
+                <Link href="/dashboard" className="btn-secondary" style={{ width: '100%', padding: '12px', textAlign: 'center' }}>
+                  Back to Dashboard
+                </Link>
+              </div>
+            </div>
+            <div className="card-static" style={{ padding: 20 }}>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase' }}>Section 80E</div>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                All interest paid on this education loan is deductible under Section 80E of the Income Tax Act — no upper limit for 8 years.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -299,7 +416,7 @@ export default function ApplyPage() {
               <Shield size={48} color="var(--primary)" style={{ margin: '0 auto 16px' }} />
               <h3 style={{ fontSize: 24, fontWeight: 900, marginBottom: 12 }}>Final Confirmation</h3>
               <button className="btn-primary" style={{ padding: '16px 40px', fontSize: 16 }}
-                onClick={() => { setSubmitted(true); addIntentEvent(30); }}>
+                onClick={handleSubmit}>
                 Submit Application
               </button>
             </div>

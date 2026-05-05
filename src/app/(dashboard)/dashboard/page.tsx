@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import {
   LayoutDashboard, Globe, Calculator, Target, CalendarDays,
-  Shield, Users, Medal, ArrowRight, Flame, Edit3
+  Shield, Users, Medal, ArrowRight, Flame, Edit3, CreditCard, Stamp
 } from 'lucide-react';
 
 const quickActions = [
@@ -15,13 +15,15 @@ const quickActions = [
   { label: 'Study Timeline', desc: 'Your action plan', href: '/timeline', icon: CalendarDays, color: '#059669' },
   { label: 'Loan Readiness', desc: 'Check your LRS score', href: '/loan-score', icon: Shield, color: '#DC2626' },
   { label: 'Parent Report', desc: 'Generate investment case', href: '/parent-report', icon: Users, color: '#7C3AED' },
+  { label: 'Visa Assistance', desc: 'Country-specific visa guide', href: '/visa', icon: Stamp, color: '#0284C7' },
+  { label: 'Repayment', desc: 'Track EMI & disbursements', href: '/repayment', icon: CreditCard, color: '#0EA5E9' },
 ];
 
 export default function DashboardPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [dbLeaderboard, setDbLeaderboard] = useState<{ name: string; score: number }[]>([]);
-  const { profile, lrs, updateLRS, streakDays, intentScore, checkStreak, isOnboarded } = useAppStore();
+  const { profile, lrs, updateLRS, streakDays, intentScore, checkStreak, isOnboarded, loanApplication } = useAppStore();
 
   useEffect(() => {
     setMounted(true);
@@ -112,6 +114,44 @@ export default function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Active Loan Banner — only shown after a loan application is submitted */}
+      {loanApplication?.submitted && (
+        <div style={{
+          marginBottom: 24, padding: '18px 24px',
+          background: 'linear-gradient(135deg, #4338CA 0%, #6C3CE1 100%)',
+          borderRadius: 'var(--radius-lg)', color: 'white',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{
+              width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              <CreditCard size={22} />
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.8, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 2 }}>
+                Active Loan Application
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 800 }}>
+                ₹{(loanApplication.principalINR / 100000).toFixed(1)} Lakhs via {loanApplication.lenderName}
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.75, marginTop: 2 }}>
+                Ref #{loanApplication.referenceId} &bull; {loanApplication.universityName}
+              </div>
+            </div>
+          </div>
+          <Link href="/repayment" style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px',
+            background: 'rgba(255,255,255,0.2)', borderRadius: 'var(--radius-full)',
+            color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 700,
+            whiteSpace: 'nowrap', flexShrink: 0,
+          }}>
+            View Repayment <ArrowRight size={14} />
+          </Link>
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, alignItems: 'flex-start' }}>
         {/* Left */}

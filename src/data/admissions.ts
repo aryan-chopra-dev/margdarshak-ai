@@ -25,18 +25,20 @@
 export const admissionModel = {
   intercept: -1.2725,
   coefficients: {
-    greScore: 0.0017,       // Per 1 point increase in GRE (out of 340)
-    toeflScore: 0.0029,     // Per 1 point increase in TOEFL
+    greScore: 0.0017,         // Per 1 point increase in GRE (out of 340)
+    toeflScore: 0.0029,       // Per 1 point increase in TOEFL
     universityRating: 0.0059, // Per 1 point increase in uni rating (1-5)
-    sopStrength: 0.0016,     // Per 1 point increase in SOP rating (1-5)
-    lorStrength: 0.0169,     // Per 1 point increase in LOR rating (1-5)
-    cgpa: 0.1184,           // Per 1 point increase in CGPA (out of 10)
-    hasResearch: 0.0244,    // Binary: has research experience
-    workExperience: 0.0085, // Per year of work experience (our addition)
+    sopStrength: 0.0016,      // Per 1 point increase in SOP rating (1-5)
+    lorStrength: 0.0169,      // Per 1 point increase in LOR rating (1-5)
+    cgpa: 0.1184,             // Per 1 point increase in CGPA (out of 10)
+    hasResearch: 0.0244,      // Binary: has research experience
+    // NOTE: workExperience is an INTERNAL HEURISTIC not present in the
+    // Acharya et al. (2019) dataset. The published R²=0.82 applies to
+    // the 7 official features above only. This adds ~+0.04 per year (max 5yr).
+    workExperience: 0.0085,
   },
-  // R² = 0.82 (from the paper) — model explains 82% of variance in the dataset
-  r2Score: 0.82,
-  modelType: "Multiple Linear Regression (MLR)",
+  r2Score: 0.82, // From paper — applies to the 7-feature published model
+  modelType: "Multiple Linear Regression (MLR) + Work Experience Heuristic",
   dataSource: "Kaggle Graduate Admissions Dataset (Mohan S Acharya, 500 records)",
   sourceUrl: "https://www.kaggle.com/datasets/mohansacharya/graduate-admissions",
   paperReference: "Acharya et al. (2019) - A Comparison of Regression Models for Prediction of Graduate Admissions"
@@ -85,13 +87,18 @@ export function predictAdmission(params: {
   const m = admissionModel.coefficients;
   const s = datasetStats;
 
-  // Convert IELTS to TOEFL if needed (standard conversion table)
+  // Convert IELTS to TOEFL if needed
+  // Lookup table based on official ETS/Cambridge concordance table
+  // Extended to cover all 0.5-step values from 4.0 – 9.0
   let toefl = params.toeflScore;
   if (params.ieltsScore && params.ieltsScore > 0 && toefl === 0) {
     const ieltsToToefl: Record<number, number> = {
-      9: 118, 8.5: 115, 8: 110, 7.5: 102, 7: 94, 6.5: 79, 6: 60
+      9.0: 118, 8.5: 115, 8.0: 110, 7.5: 102, 7.0: 94,
+      6.5: 79,  6.0: 60,  5.5: 46,  5.0: 35,  4.5: 32, 4.0: 27
     };
-    toefl = ieltsToToefl[params.ieltsScore] || Math.round(params.ieltsScore * 12.5 + 5);
+    // Use lookup first; fall back to linear interpolation for any unlisted score
+    toefl = ieltsToToefl[params.ieltsScore] ??
+      Math.round(params.ieltsScore * 12.5 + 5);
   }
 
   // Calculate raw probability using regression model
@@ -105,11 +112,13 @@ export function predictAdmission(params: {
     + m.hasResearch * (params.hasResearch ? 1 : 0)
     + m.workExperience * Math.min(params.workExperienceYears, 5);
 
-  // Clamp to [0, 1]
+  // Clamp probability to realistic range [0.05, 0.97]
   const probability = Math.max(0.05, Math.min(0.97, rawProb));
 
-  // Determine percentile (compared to dataset distribution)
-  const zScore = (probability - s.chanceOfAdmit.mean) / s.chanceOfAdmit.std;
+  // Determine percentile using the RAW model output (before clamping)
+  // so that candidates well below/above the dataset range are correctly classified.
+  // Comparison is vs the Kaggle dataset of 500 graduate-program applicants.
+  const zScore = (rawProb - s.chanceOfAdmit.mean) / s.chanceOfAdmit.std;
   let percentile: string;
   if (zScore > 1.5) percentile = "Top 5%";
   else if (zScore > 1.0) percentile = "Top 15%";

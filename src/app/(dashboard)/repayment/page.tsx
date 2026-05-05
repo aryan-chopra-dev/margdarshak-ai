@@ -1,6 +1,7 @@
 'use client';
 import { useAppStore } from '@/lib/store';
 import { universities } from '@/data/universities';
+import { calculateEMI } from '@/data/loans';
 import { 
   Building2, Calendar, CheckCircle2, ChevronRight, 
   Circle, Clock, CreditCard, PlaneTakeoff, 
@@ -17,9 +18,24 @@ export default function RepaymentDashboardPage() {
   useEffect(() => { setMounted(true); }, []);
 
   const topUni = universities.find(u => profile.shortlistedUniversities?.includes(u.id)) || universities[0];
-  
-  // Dummy calculated loan state
-  const principal = topUni.tuitionUSD * 2 * USD_TO_INR; // ~9 Lakhs for IITB, ~1Cr for MIT
+  const uniCountry = topUni.country;
+
+  // Loan principal = Tuition + Living Costs across program duration
+  // Uses the same per-country living cost lookup as the ROI Calculator for consistency
+  const livingCostPerYear = uniCountry === 'United States' ? 20000 :
+    uniCountry === 'United Kingdom' ? 18000 :
+    uniCountry === 'Canada' ? 15000 :
+    uniCountry === 'Germany' ? 12000 :
+    uniCountry === 'India' ? 3000 : 16000;
+  const programYears = uniCountry === 'United Kingdom' ? 1 : 2;
+  const totalCostUSD = (topUni.tuitionUSD + livingCostPerYear) * programYears;
+  const principal = totalCostUSD * USD_TO_INR;
+
+  // Poonawala Fincorp default loan terms
+  const LOAN_RATE = 11.25; // % p.a.
+  const LOAN_TENURE = 10;  // years
+  const emiData = calculateEMI(principal, LOAN_RATE, LOAN_TENURE);
+
   const emiStart = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2.5); // 2.5 years from now
   const nextDisbursement = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // 30 days from now
 
@@ -158,7 +174,7 @@ export default function RepaymentDashboardPage() {
                         </div>
                       </div>
                       <div style={{ fontWeight: 700 }}>
-                        ₹{(Math.round(principal * 0.0125)).toLocaleString('en-IN')}
+                        ₹{(emiData.emi).toLocaleString('en-IN')}
                       </div>
                     </div>
                   );

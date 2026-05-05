@@ -84,6 +84,19 @@ interface AppState {
   setChatOpen: (val: boolean) => void;
   chatHistory: { role: 'user' | 'assistant'; content: string, traces?: string[] }[];
   addChatMessage: (msg: { role: 'user' | 'assistant'; content: string, traces?: string[] }) => void;
+
+  // Loan Application
+  loanApplication: {
+    submitted: boolean;
+    lenderId: string;
+    lenderName: string;
+    universityName: string;
+    principalINR: number;
+    submittedAt: string;    // ISO date string
+    referenceId: string;
+  } | null;
+  setLoanApplication: (app: NonNullable<AppState['loanApplication']>) => void;
+  clearLoanApplication: () => void;
 }
 
 const defaultProfile: UserProfile = {
@@ -99,7 +112,11 @@ const defaultProfile: UserProfile = {
 };
 
 export function calculateLRS(profile: UserProfile, engagementSignal = 0): LRSState {
-  // Profile Completeness (25%)
+  const SCORE_MIN = 300;
+  const SCORE_MAX = 850;
+  const SCORE_RANGE = SCORE_MAX - SCORE_MIN; // 550
+
+  // Profile Completeness (25% weight) — max 100 pts
   let profileScore = 0;
   if (profile.name) profileScore += 15;
   if (profile.email) profileScore += 10;
@@ -109,44 +126,50 @@ export function calculateLRS(profile: UserProfile, engagementSignal = 0): LRSSta
   if (profile.targetField) profileScore += 10;
   if (profile.workExperience > 0) profileScore += 10;
 
-  // Document Readiness (25%)
+  // Document Readiness (25% weight) — max 100 pts
   let docScore = 0;
   const docs = profile?.docsUploaded;
   const docCount = Array.isArray(docs) ? docs.length : (docs ? Object.keys(docs).length : 0);
   docScore = Math.min(100, docCount * 25);
 
-  // Co-applicant Details (20%)
+  // Co-applicant Details (20% weight) — max 100 pts
   let coAppScore = 0;
   if (profile.parentName) coAppScore += 20;
   if (profile.parentPhone) coAppScore += 20;
   if (profile.parentIncome > 0) coAppScore += 40;
   if (profile.parentOccupation) coAppScore += 20;
 
-  // Shortlist (15%)
+  // Shortlist (15% weight) — max 100 pts
   let shortlistScore = 0;
   const shortlistCount = profile?.shortlistedUniversities?.length || 0;
   if (shortlistCount > 0) shortlistScore = 50;
   if (shortlistCount > 2) shortlistScore = 100;
 
-  // Compute total (Base 300, max 850)
-  // [FIX FM-3]: All 5 components now correctly included.
-  // Weights: profile(25%) + docs(25%) + coApp(20%) + shortlist(15%) + engagement(15%) = 100%
-  // Multiplier: max_score = 300 + (100 * 1.0 * 5.5) = 850 ✓
-  const total = 300 +
-    (profileScore * 0.25 * 5.5) +
-    (docScore * 0.25 * 5.5) +
-    (coAppScore * 0.20 * 5.5) +
-    (shortlistScore * 0.15 * 5.5) +
-    (engagementSignal * 0.15 * 5.5); // Previously MISSING — capped max at 767.5
+  // Engagement signal (15% weight) — intentScore is bounded [0,100] by addIntentEvent
+  // Defensive clamp here ensures any direct calls to calculateLRS can't overflow
+  const engagementCapped = Math.min(100, Math.max(0, engagementSignal));
+
+  // Weighted composite: weights sum to 1.0 → rawWeighted ∈ [0, 100]
+  const rawWeighted =
+    profileScore    * 0.25 +
+    docScore        * 0.25 +
+    coAppScore      * 0.20 +
+    shortlistScore  * 0.15 +
+    engagementCapped * 0.15;
+
+  // Map [0, 100] → [SCORE_MIN, SCORE_MAX]
+  // Mathematically identical to the previous (x * weight * 5.5) formulation
+  // but self-documenting: if the score range changes, only SCORE_MIN/MAX need updating.
+  const total = SCORE_MIN + (rawWeighted / 100) * SCORE_RANGE;
 
   return {
-    score: Math.min(850, Math.round(total)),
+    score: Math.min(SCORE_MAX, Math.round(total)),
     breakdown: {
       profileCompleteness: profileScore,
       documentReadiness: docScore,
       coApplicantDetails: coAppScore,
       universityShortlist: shortlistScore,
-      engagementSignal,
+      engagementSignal: engagementCapped,
     }
   };
 }
@@ -244,7 +267,11 @@ export const useAppStore = create<AppState>()(
       chatHistory: [],
       addChatMessage: (msg) => set((state) => ({
         chatHistory: [...state.chatHistory, msg]
-      }))
+      })),
+
+      loanApplication: null,
+      setLoanApplication: (app) => set({ loanApplication: app }),
+      clearLoanApplication: () => set({ loanApplication: null }),
     }),
     {
       name: 'margdarshak-storage',
@@ -270,10 +297,15 @@ export const useAppStore = create<AppState>()(
         streakDays: state.streakDays,
         theme: state.theme,
         onboardingDraft: state.onboardingDraft,
+        loanApplication: state.loanApplication,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.setHydrated(true);
+          // Recompute LRS from the restored profile so the score is always
+          // consistent with stored data — prevents the stale 310 default showing
+          // on every page reload until a user action triggers updateLRS().
+          state.updateLRS();
         }
       }
     }

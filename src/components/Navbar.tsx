@@ -7,7 +7,7 @@ import ThemeToggle from './ThemeToggle';
 import {
   LayoutDashboard, Globe, Calculator, Target,
   CalendarDays, Shield, Sparkles, Users, GraduationCap,
-  FileCheck,
+  FileCheck, CreditCard, Stamp,
 } from 'lucide-react';
 
 const navItems = [
@@ -24,8 +24,25 @@ const navItems = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { isOnboarded, profile, isAuthenticated, lrs } = useAppStore();
+  const { isOnboarded, profile, isAuthenticated, lrs, loanApplication } = useAppStore();
   const isPublic = pathname === '/' || pathname === '/login';
+
+  const navItems = [
+    { label: 'Dashboard',    href: '/dashboard',           icon: LayoutDashboard },
+    { label: 'Universities', href: '/career-navigator',    icon: Globe },
+    { label: 'ROI',          href: '/roi-calculator',      icon: Calculator },
+    { label: 'Predictor',    href: '/admission-predictor', icon: Target },
+    { label: 'Scholarships', href: '/scholarships',        icon: GraduationCap },
+    { label: 'Apply',        href: '/apply',               icon: FileCheck },
+    { label: 'Visa',         href: '/visa',                icon: Stamp },
+    { label: 'Timeline',     href: '/timeline',            icon: CalendarDays },
+    { label: 'LRS Score',    href: '/loan-score',          icon: Shield },
+    { label: 'Community',    href: '/community',           icon: Users },
+    // Only surface Repayment once the user has an active loan
+    ...(loanApplication?.submitted
+      ? [{ label: 'Repayment', href: '/repayment', icon: CreditCard }]
+      : []),
+  ];
 
   useEffect(() => {
     if (isAuthenticated && profile?.email && lrs?.score) {
