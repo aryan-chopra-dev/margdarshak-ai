@@ -37,12 +37,13 @@ export default function LoanScorePage() {
 
   const handleFakeDocUpload = (docKey: string) => {
     if (!uploadedKeys.includes(docKey)) {
-      if (Array.isArray(profile.docsUploaded)) {
-        setProfile({ docsUploaded: [...profile.docsUploaded, docKey] });
-      } else {
-        // Mock the object shape for compatibility with the new profile page
-        setProfile({ docsUploaded: { ...profile.docsUploaded, [docKey]: { name: 'mock-upload.pdf', url: '#' } } as any });
-      }
+      const existingDocs = Array.isArray(profile.docsUploaded)
+        ? profile.docsUploaded
+        : profile.docsUploaded && typeof profile.docsUploaded === 'object'
+          ? Object.keys(profile.docsUploaded)
+          : [];
+
+      setProfile({ docsUploaded: [...new Set([...existingDocs, docKey])] });
       addIntentEvent(10);
     }
   };

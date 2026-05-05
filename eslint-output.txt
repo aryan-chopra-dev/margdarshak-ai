@@ -1,0 +1,608 @@
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\scripts\check-lrs.ts[24m[0m
+[0m  [2m16:17[22m  [33mwarning[39m  'error' is assigned a value but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\scripts\recalc-lrs.ts[24m[0m
+[0m  [2m23:23[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m25:40[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m31:31[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(auth)\login\page.tsx[24m[0m
+[0m  [2m304:117[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(auth)\onboarding\page.tsx[24m[0m
+[0m  [2m93:5[22m  [31merror[39m  Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(auth)\onboarding\page.tsx:93:5[0m
+[0m  91 |[0m
+[0m  92 |   useEffect(() => {[0m
+[0m> 93 |     setMounted(true);[0m
+[0m     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  94 |     if (isOnboarded) {[0m
+[0m  95 |       router.replace('/dashboard');[0m
+[0m  96 |       return;  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\admin\marketing\page.tsx[24m[0m
+[0m   [2m4:8[22m   [33mwarning[39m  'Link' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m13:21[22m  [31merror[39m    Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\admin\marketing\page.tsx:13:21[0m
+[0m  11 |   const [mounted, setMounted] = useState(false);[0m
+[0m  12 |[0m
+[0m> 13 |   useEffect(() => { setMounted(true); }, []);[0m
+[0m     |                     ^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  14 |[0m
+[0m  15 |   const handleGenerate = async () => {[0m
+[0m  16 |     setLoading(true);  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m  [2m26:14[22m  [33mwarning[39m  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\admin\monetization\page.tsx[24m[0m
+[0m   [2m10:21[22m  [31merror[39m  Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\admin\monetization\page.tsx:10:21[0m
+[0m   8 | export default function B2BMonetizationDashboard() {[0m
+[0m   9 |   const [mounted, setMounted] = useState(false);[0m
+[0m> 10 |   useEffect(() => { setMounted(true); }, []);[0m
+[0m     |                     ^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  11 |[0m
+[0m  12 |   if (!mounted) return null;[0m
+[0m  13 |  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m  [2m126:64[22m  [31merror[39m  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\admission-predictor\page.tsx[24m[0m
+[0m    [2m6:21[22m  [33mwarning[39m  'TrendingUp' is defined but never used                           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m214:67[22m  [31merror[39m    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  [2mreact/no-unescaped-entities[22m[0m
+[0m  [2m214:86[22m  [31merror[39m    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  [2mreact/no-unescaped-entities[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\apply\page.tsx[24m[0m
+[0m   [2m4:24[22m  [33mwarning[39m  'calculateEMI' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m8:13[22m  [33mwarning[39m  'Clock' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m26:9[22m   [33mwarning[39m  'loanAmount' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m34:5[22m   [31merror[39m    Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\apply\page.tsx:34:5[0m
+[0m  32 |   useEffect(() => {[0m
+[0m  33 |     // Only init name/email/course/gpa from profile. Don't overwrite University. Let OCR handle that.[0m
+[0m> 34 |     setFormData(f => ({[0m
+[0m     |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  35 |       ...f,[0m
+[0m  36 |       name: profile.name || 'Student Name',[0m
+[0m  37 |       email: profile.email || 'student@domain.com',  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m  [2m88:14[22m  [33mwarning[39m  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\career-navigator\page.tsx[24m[0m
+[0m  [2m6:18[22m  [33mwarning[39m  'SlidersHorizontal' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m7:51[22m  [33mwarning[39m  'Star' is defined but never used               [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\community\page.tsx[24m[0m
+[0m  [2m22:21[22m  [31merror[39m  Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\community\page.tsx:22:21[0m
+[0m  20 |   const [activeTab, setActiveTab] = useState<'peers' | 'tours'>('peers');[0m
+[0m  21 |   [0m
+[0m> 22 |   useEffect(() => { setMounted(true); }, []);[0m
+[0m     |                     ^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  23 |[0m
+[0m  24 |   const topUni = universities.find(u => profile.shortlistedUniversities?.includes(u.id)) || universities[0];[0m
+[0m  25 |  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\dashboard\page.tsx[24m[0m
+[0m  [2m27:5[22m   [31merror[39m  Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\dashboard\page.tsx:27:5[0m
+[0m  25 |[0m
+[0m  26 |   useEffect(() => {[0m
+[0m> 27 |     setMounted(true);[0m
+[0m     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  28 |   }, []);[0m
+[0m  29 |[0m
+[0m  30 |   useEffect(() => {  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m  [2m44:46[22m  [31merror[39m  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\loan-score\page.tsx[24m[0m
+[0m   [2m6:25[22m  [33mwarning[39m  'AlertCircle' is defined but never used                                                                                              [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m23:6[22m   [33mwarning[39m  React Hook useEffect has missing dependencies: 'addIntentEvent' and 'updateLRS'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\marketplace\page.tsx[24m[0m
+[0m   [2m4:33[22m  [33mwarning[39m  'ArrowRight' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m4:45[22m  [33mwarning[39m  'TrendingDown' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m71:21[22m  [31merror[39m    Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\marketplace\page.tsx:71:21[0m
+[0m  69 |   const [mounted, setMounted] = useState(false);[0m
+[0m  70 |   [0m
+[0m> 71 |   useEffect(() => { setMounted(true); }, []);[0m
+[0m     |                     ^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  72 |[0m
+[0m  73 |   const topUni = universities.find(u => profile.shortlistedUniversities?.includes(u.id)) || universities[0];[0m
+[0m  74 |   const USD_TO_INR = 83;  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\parent-report\page.tsx[24m[0m
+[0m    [2m9:3[22m   [33mwarning[39m  'CheckCircle2' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:39[22m  [33mwarning[39m  'Star' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:45[22m  [33mwarning[39m  'AlertTriangle' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m10:32[22m  [33mwarning[39m  'Globe' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m102:90[22m  [31merror[39m    Error: Cannot call impure function during render[0m
+[0m[0m
+[0m`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\parent-report\page.tsx:102:90[0m
+[0m  100 |               <div style={{ textAlign: 'right' }}>[0m
+[0m  101 |                 <div style={{ fontSize: 9, color: '#9CA3AF' }}>CONFIDENTIAL — Generated {reportDate}</div>[0m
+[0m> 102 |                 <div style={{ fontSize: 9, color: '#9CA3AF' }}>Document #MGD-{Math.floor(Math.random() * 90000) + 10000}</div>[0m
+[0m      |                                                                                          ^^^^^^^^^^^^^ Cannot call impure function[0m
+[0m  103 |               </div>[0m
+[0m  104 |             </div>[0m
+[0m  105 |             <div style={{ height: 2, background: 'linear-gradient(90deg, #4F46E5, #0D9488)' }} />  [2mreact-hooks/purity[22m[0m
+[0m  [2m496:57[22m  [31merror[39m    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       [2mreact/no-unescaped-entities[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx[24m[0m
+[0m    [2m7:9[22m   [33mwarning[39m  'Mail' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m7:15[22m  [33mwarning[39m  'Phone' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:3[22m   [33mwarning[39m  'Briefcase' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m116:24[22m  [33mwarning[39m  'rule' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m176:89[22m  [31merror[39m    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m244:16[22m  [31merror[39m    Error: Cannot create components during render[0m
+[0m[0m
+[0mComponents created during render will reset their state each time they are created. Declare components outside of render.[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:244:16[0m
+[0m  242 |               <label className="input-label">Full Name *</label>[0m
+[0m  243 |               <input name="name" className={`input-field ${fieldErrors.name ? 'error' : ''}`} value={formData.name} onChange={handleChange} required />[0m
+[0m> 244 |               <FieldError field="name" />[0m
+[0m      |                ^^^^^^^^^^ This component is created during render[0m
+[0m  245 |             </div>[0m
+[0m  246 |             <div>[0m
+[0m  247 |               <label className="input-label">Email Address *</label>[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:210:22[0m
+[0m  208 |[0m
+[0m  209 |   // ---- Inline error display helper ----[0m
+[0m> 210 |   const FieldError = ({ field }: { field: string }) => {[0m
+[0m      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 211 |     if (!fieldErrors[field]) return null;[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 212 |     return ([0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 213 |       <span style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, marginTop: 4, display: 'block' }}>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 214 |         {fieldErrors[field]}[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 215 |       </span>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 216 |     );[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 217 |   };[0m
+[0m      | ^^^^ The component is created during render here[0m
+[0m  218 |[0m
+[0m  219 |   return ([0m
+[0m  220 |     <div className="page-container" style={{ maxWidth: 700, margin: '0 auto', paddingTop: 60 }}>                    [2mreact-hooks/static-components[22m[0m
+[0m  [2m249:16[22m  [31merror[39m    Error: Cannot create components during render[0m
+[0m[0m
+[0mComponents created during render will reset their state each time they are created. Declare components outside of render.[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:249:16[0m
+[0m  247 |               <label className="input-label">Email Address *</label>[0m
+[0m  248 |               <input name="email" type="email" className={`input-field ${fieldErrors.email ? 'error' : ''}`} value={formData.email} onChange={handleChange} required />[0m
+[0m> 249 |               <FieldError field="email" />[0m
+[0m      |                ^^^^^^^^^^ This component is created during render[0m
+[0m  250 |             </div>[0m
+[0m  251 |             <div>[0m
+[0m  252 |               <label className="input-label">Phone Number</label>[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:210:22[0m
+[0m  208 |[0m
+[0m  209 |   // ---- Inline error display helper ----[0m
+[0m> 210 |   const FieldError = ({ field }: { field: string }) => {[0m
+[0m      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 211 |     if (!fieldErrors[field]) return null;[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 212 |     return ([0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 213 |       <span style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, marginTop: 4, display: 'block' }}>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 214 |         {fieldErrors[field]}[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 215 |       </span>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 216 |     );[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 217 |   };[0m
+[0m      | ^^^^ The component is created during render here[0m
+[0m  218 |[0m
+[0m  219 |   return ([0m
+[0m  220 |     <div className="page-container" style={{ maxWidth: 700, margin: '0 auto', paddingTop: 60 }}>  [2mreact-hooks/static-components[22m[0m
+[0m  [2m277:16[22m  [31merror[39m    Error: Cannot create components during render[0m
+[0m[0m
+[0mComponents created during render will reset their state each time they are created. Declare components outside of render.[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:277:16[0m
+[0m  275 |                 className={`input-field ${fieldErrors.gpa ? 'error' : ''}`}[0m
+[0m  276 |                 value={formData.gpa} onChange={handleChange} onBlur={handleBlur} />[0m
+[0m> 277 |               <FieldError field="gpa" />[0m
+[0m      |                ^^^^^^^^^^ This component is created during render[0m
+[0m  278 |             </div>[0m
+[0m  279 |             <div>[0m
+[0m  280 |               <label className="input-label">GRE Score (260–340)</label>[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:210:22[0m
+[0m  208 |[0m
+[0m  209 |   // ---- Inline error display helper ----[0m
+[0m> 210 |   const FieldError = ({ field }: { field: string }) => {[0m
+[0m      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 211 |     if (!fieldErrors[field]) return null;[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 212 |     return ([0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 213 |       <span style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, marginTop: 4, display: 'block' }}>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 214 |         {fieldErrors[field]}[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 215 |       </span>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 216 |     );[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 217 |   };[0m
+[0m      | ^^^^ The component is created during render here[0m
+[0m  218 |[0m
+[0m  219 |   return ([0m
+[0m  220 |     <div className="page-container" style={{ maxWidth: 700, margin: '0 auto', paddingTop: 60 }}>                                                                          [2mreact-hooks/static-components[22m[0m
+[0m  [2m284:16[22m  [31merror[39m    Error: Cannot create components during render[0m
+[0m[0m
+[0mComponents created during render will reset their state each time they are created. Declare components outside of render.[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:284:16[0m
+[0m  282 |                 className={`input-field ${fieldErrors.greScore ? 'error' : ''}`}[0m
+[0m  283 |                 value={formData.greScore} onChange={handleChange} onBlur={handleBlur} />[0m
+[0m> 284 |               <FieldError field="greScore" />[0m
+[0m      |                ^^^^^^^^^^ This component is created during render[0m
+[0m  285 |             </div>[0m
+[0m  286 |             <div>[0m
+[0m  287 |               <label className="input-label">Work Exp (0–30 yrs)</label>[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:210:22[0m
+[0m  208 |[0m
+[0m  209 |   // ---- Inline error display helper ----[0m
+[0m> 210 |   const FieldError = ({ field }: { field: string }) => {[0m
+[0m      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 211 |     if (!fieldErrors[field]) return null;[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 212 |     return ([0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 213 |       <span style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, marginTop: 4, display: 'block' }}>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 214 |         {fieldErrors[field]}[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 215 |       </span>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 216 |     );[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 217 |   };[0m
+[0m      | ^^^^ The component is created during render here[0m
+[0m  218 |[0m
+[0m  219 |   return ([0m
+[0m  220 |     <div className="page-container" style={{ maxWidth: 700, margin: '0 auto', paddingTop: 60 }}>                                                           [2mreact-hooks/static-components[22m[0m
+[0m  [2m291:16[22m  [31merror[39m    Error: Cannot create components during render[0m
+[0m[0m
+[0mComponents created during render will reset their state each time they are created. Declare components outside of render.[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:291:16[0m
+[0m  289 |                 className={`input-field ${fieldErrors.workExperience ? 'error' : ''}`}[0m
+[0m  290 |                 value={formData.workExperience} onChange={handleChange} onBlur={handleBlur} />[0m
+[0m> 291 |               <FieldError field="workExperience" />[0m
+[0m      |                ^^^^^^^^^^ This component is created during render[0m
+[0m  292 |             </div>[0m
+[0m  293 |             <div>[0m
+[0m  294 |               <label className="input-label">TOEFL (0–120)</label>[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:210:22[0m
+[0m  208 |[0m
+[0m  209 |   // ---- Inline error display helper ----[0m
+[0m> 210 |   const FieldError = ({ field }: { field: string }) => {[0m
+[0m      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 211 |     if (!fieldErrors[field]) return null;[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 212 |     return ([0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 213 |       <span style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, marginTop: 4, display: 'block' }}>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 214 |         {fieldErrors[field]}[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 215 |       </span>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 216 |     );[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 217 |   };[0m
+[0m      | ^^^^ The component is created during render here[0m
+[0m  218 |[0m
+[0m  219 |   return ([0m
+[0m  220 |     <div className="page-container" style={{ maxWidth: 700, margin: '0 auto', paddingTop: 60 }}>                                               [2mreact-hooks/static-components[22m[0m
+[0m  [2m298:16[22m  [31merror[39m    Error: Cannot create components during render[0m
+[0m[0m
+[0mComponents created during render will reset their state each time they are created. Declare components outside of render.[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:298:16[0m
+[0m  296 |                 className={`input-field ${fieldErrors.toeflScore ? 'error' : ''}`}[0m
+[0m  297 |                 value={formData.toeflScore} onChange={handleChange} onBlur={handleBlur} />[0m
+[0m> 298 |               <FieldError field="toeflScore" />[0m
+[0m      |                ^^^^^^^^^^ This component is created during render[0m
+[0m  299 |             </div>[0m
+[0m  300 |             <div>[0m
+[0m  301 |               <label className="input-label">IELTS (0–9)</label>[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:210:22[0m
+[0m  208 |[0m
+[0m  209 |   // ---- Inline error display helper ----[0m
+[0m> 210 |   const FieldError = ({ field }: { field: string }) => {[0m
+[0m      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 211 |     if (!fieldErrors[field]) return null;[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 212 |     return ([0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 213 |       <span style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, marginTop: 4, display: 'block' }}>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 214 |         {fieldErrors[field]}[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 215 |       </span>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 216 |     );[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 217 |   };[0m
+[0m      | ^^^^ The component is created during render here[0m
+[0m  218 |[0m
+[0m  219 |   return ([0m
+[0m  220 |     <div className="page-container" style={{ maxWidth: 700, margin: '0 auto', paddingTop: 60 }}>                                                             [2mreact-hooks/static-components[22m[0m
+[0m  [2m305:16[22m  [31merror[39m    Error: Cannot create components during render[0m
+[0m[0m
+[0mComponents created during render will reset their state each time they are created. Declare components outside of render.[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:305:16[0m
+[0m  303 |                 className={`input-field ${fieldErrors.ieltsScore ? 'error' : ''}`}[0m
+[0m  304 |                 value={formData.ieltsScore} onChange={handleChange} onBlur={handleBlur} />[0m
+[0m> 305 |               <FieldError field="ieltsScore" />[0m
+[0m      |                ^^^^^^^^^^ This component is created during render[0m
+[0m  306 |             </div>[0m
+[0m  307 |           </div>[0m
+[0m  308 |         </div>[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:210:22[0m
+[0m  208 |[0m
+[0m  209 |   // ---- Inline error display helper ----[0m
+[0m> 210 |   const FieldError = ({ field }: { field: string }) => {[0m
+[0m      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 211 |     if (!fieldErrors[field]) return null;[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 212 |     return ([0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 213 |       <span style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, marginTop: 4, display: 'block' }}>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 214 |         {fieldErrors[field]}[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 215 |       </span>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 216 |     );[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 217 |   };[0m
+[0m      | ^^^^ The component is created during render here[0m
+[0m  218 |[0m
+[0m  219 |   return ([0m
+[0m  220 |     <div className="page-container" style={{ maxWidth: 700, margin: '0 auto', paddingTop: 60 }}>                                                                                                                [2mreact-hooks/static-components[22m[0m
+[0m  [2m358:16[22m  [31merror[39m    Error: Cannot create components during render[0m
+[0m[0m
+[0mComponents created during render will reset their state each time they are created. Declare components outside of render.[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:358:16[0m
+[0m  356 |                   placeholder="e.g. 1200000" />[0m
+[0m  357 |               </div>[0m
+[0m> 358 |               <FieldError field="parentIncome" />[0m
+[0m      |                ^^^^^^^^^^ This component is created during render[0m
+[0m  359 |             </div>[0m
+[0m  360 |             <div>[0m
+[0m  361 |               <label className="input-label">Occupation</label>[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\profile\page.tsx:210:22[0m
+[0m  208 |[0m
+[0m  209 |   // ---- Inline error display helper ----[0m
+[0m> 210 |   const FieldError = ({ field }: { field: string }) => {[0m
+[0m      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 211 |     if (!fieldErrors[field]) return null;[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 212 |     return ([0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 213 |       <span style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, marginTop: 4, display: 'block' }}>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 214 |         {fieldErrors[field]}[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 215 |       </span>[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 216 |     );[0m
+[0m      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m> 217 |   };[0m
+[0m      | ^^^^ The component is created during render here[0m
+[0m  218 |[0m
+[0m  219 |   return ([0m
+[0m  220 |     <div className="page-container" style={{ maxWidth: 700, margin: '0 auto', paddingTop: 60 }}>                                                                                                                                                                     [2mreact-hooks/static-components[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\repayment\page.tsx[24m[0m
+[0m   [2m5:38[22m  [33mwarning[39m  'ChevronRight' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m7:25[22m  [33mwarning[39m  'IndianRupee' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m17:21[22m  [31merror[39m    Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\repayment\page.tsx:17:21[0m
+[0m  15 |   const [mounted, setMounted] = useState(false);[0m
+[0m  16 |   [0m
+[0m> 17 |   useEffect(() => { setMounted(true); }, []);[0m
+[0m     |                     ^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  18 |[0m
+[0m  19 |   const topUni = universities.find(u => profile.shortlistedUniversities?.includes(u.id)) || universities[0];[0m
+[0m  20 |     [2mreact-hooks/set-state-in-effect[22m[0m
+[0m  [2m23:29[22m  [31merror[39m    Error: Cannot call impure function during render[0m
+[0m[0m
+[0m`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\repayment\page.tsx:23:29[0m
+[0m  21 |   // Dummy calculated loan state[0m
+[0m  22 |   const principal = topUni.tuitionUSD * 2 * USD_TO_INR; // ~9 Lakhs for IITB, ~1Cr for MIT[0m
+[0m> 23 |   const emiStart = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2.5); // 2.5 years from now[0m
+[0m     |                             ^^^^^^^^^^ Cannot call impure function[0m
+[0m  24 |   const nextDisbursement = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // 30 days from now[0m
+[0m  25 |[0m
+[0m  26 |   if (!mounted) return null;                                                                                                                                                                                                                                                             [2mreact-hooks/purity[22m[0m
+[0m  [2m24:37[22m  [31merror[39m    Error: Cannot call impure function during render[0m
+[0m[0m
+[0m`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\repayment\page.tsx:24:37[0m
+[0m  22 |   const principal = topUni.tuitionUSD * 2 * USD_TO_INR; // ~9 Lakhs for IITB, ~1Cr for MIT[0m
+[0m  23 |   const emiStart = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2.5); // 2.5 years from now[0m
+[0m> 24 |   const nextDisbursement = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // 30 days from now[0m
+[0m     |                                     ^^^^^^^^^^ Cannot call impure function[0m
+[0m  25 |[0m
+[0m  26 |   if (!mounted) return null;[0m
+[0m  27 |                                                                                                                                                                                                                                                                                      [2mreact-hooks/purity[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\roi-calculator\page.tsx[24m[0m
+[0m  [2m2:20[22m  [33mwarning[39m  'useMemo' is defined but never used       [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m4:10[22m  [33mwarning[39m  'loanProducts' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m8:40[22m  [33mwarning[39m  'ArrowRight' is defined but never used    [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m9:14[22m  [33mwarning[39m  'PieChart' is defined but never used      [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\scholarships\page.tsx[24m[0m
+[0m   [2m5:25[22m  [33mwarning[39m  'MapPin' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m5:33[22m  [33mwarning[39m  'Calendar' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m5:56[22m  [33mwarning[39m  'Search' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m15:21[22m  [31merror[39m    Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\scholarships\page.tsx:15:21[0m
+[0m  13 |   const [evalResults, setEvalResults] = useState<Record<string, { percentage: number, reasoning: string }>>({});[0m
+[0m  14 |[0m
+[0m> 15 |   useEffect(() => { setMounted(true); }, []);[0m
+[0m     |                     ^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  16 |[0m
+[0m  17 |   const handleEvaluate = async (scholarship: any) => {[0m
+[0m  18 |     setEvaluating(scholarship.id);  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m  [2m17:46[22m  [31merror[39m    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m36:14[22m  [33mwarning[39m  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\(dashboard)\timeline\page.tsx[24m[0m
+[0m   [2m11:59[22m  [31merror[39m  Unexpected any. Specify a different type                         [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m234:26[22m  [31merror[39m  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  [2mreact/no-unescaped-entities[22m[0m
+[0m  [2m234:54[22m  [31merror[39m  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  [2mreact/no-unescaped-entities[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\app\api\profile\route.ts[24m[0m
+[0m  [2m14:23[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m16:40[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m54:35[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\components\AuthGuard.tsx[24m[0m
+[0m  [2m55:13[22m  [31merror[39m  Error: Cannot create components during render[0m
+[0m[0m
+[0mComponents created during render will reset their state each time they are created. Declare components outside of render.[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\components\AuthGuard.tsx:55:13[0m
+[0m  53 |[0m
+[0m  54 |   if (!isHydrated) {[0m
+[0m> 55 |     return <LoadingScreen />;[0m
+[0m     |             ^^^^^^^^^^^^^ This component is created during render[0m
+[0m  56 |   }[0m
+[0m  57 |[0m
+[0m  58 |   return <>{children}</>;[0m
+[0m[0m
+[0mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\components\AuthGuard.tsx:20:25[0m
+[0m  18 |   const isHydrated = useAppStore((s) => s.isHydrated);[0m
+[0m  19 |[0m
+[0m> 20 |   const LoadingScreen = () => ([0m
+[0m     |                         ^^^^^^^[0m
+[0m> 21 |     <div style={{[0m
+[0m     | ^^^^^^^^^^^^^^^^^[0m
+[0m> 22 |       minHeight: '100vh',[0m
+[0m     …[0m
+[0m     | ^^^^^^^^^^^^^^^^^[0m
+[0m> 44 |     </div>[0m
+[0m     | ^^^^^^^^^^^^^^^^^[0m
+[0m> 45 |   );[0m
+[0m     | ^^^^ The component is created during render here[0m
+[0m  46 |[0m
+[0m  47 |   useEffect(() => {[0m
+[0m  48 |     // Only care about the /login page: if already authed, skip ahead  [2mreact-hooks/static-components[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\components\ChatWidget.tsx[24m[0m
+[0m    [2m6:10[22m  [33mwarning[39m  'loanProducts' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m8:32[22m  [33mwarning[39m  'User' is defined but never used                 [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:3[22m   [33mwarning[39m  'ExternalLink' is defined but never used         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m14:51[22m  [31merror[39m    Unexpected any. Specify a different type         [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m35:11[22m  [33mwarning[39m  'targetType' is assigned a value but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m136:98[22m  [31merror[39m    Unexpected any. Specify a different type         [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m138:99[22m  [31merror[39m    Unexpected any. Specify a different type         [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m140:16[22m  [33mwarning[39m  'err' is defined but never used                  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m142:83[22m  [31merror[39m    Unexpected any. Specify a different type         [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m146:81[22m  [31merror[39m    Unexpected any. Specify a different type         [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m251:32[22m  [31merror[39m    Unexpected any. Specify a different type         [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\components\Navbar.tsx[24m[0m
+[0m  [2m27:11[22m  [33mwarning[39m  'isOnboarded' is assigned a value but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m28:9[22m   [33mwarning[39m  'isPublic' is assigned a value but never used     [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\data\admissions.ts[24m[0m
+[0m  [2m98:7[22m  [31merror[39m  'rawProb' is never reassigned. Use 'const' instead  [2mprefer-const[22m[0m
+[0m[0m
+[0m[4mC:\Users\ARYA MULAY\OneDrive\Desktop\projects\TenzorX_Hackathon\margdarshak-ai\src\lib\store.ts[24m[0m
+[0m  [2m156:11[22m  [33mwarning[39m  'get' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[31m[1m✖ 85 problems (45 errors, 40 warnings)[22m[39m[0m
+[0m[31m[1m[22m[39m[31m[1m  1 error and 0 warnings potentially fixable with the `--fix` option.[22m[39m[0m
+[0m[31m[1m[22m[39m[0m
