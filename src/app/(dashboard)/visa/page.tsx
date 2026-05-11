@@ -4,7 +4,7 @@ import { useAppStore } from '@/lib/store';
 import Link from 'next/link';
 import {
   Globe, CheckCircle2, Clock, DollarSign, FileText,
-  AlertCircle, ChevronRight, ExternalLink, Briefcase,
+  AlertCircle, ExternalLink, Briefcase,
   Shield, Calendar, ArrowRight, Info, Plane
 } from 'lucide-react';
 
@@ -59,10 +59,11 @@ const visaData = {
     officialUrl: 'https://www.gov.uk/student-visa',
     color: '#DC2626',
     processingTime: '3–8 weeks',
-    fee: '₹64,380',
+    fee: '₹1,03,820',
     feeBreakdown: [
       { item: 'Visa Application Fee', amount: '₹40,740 (£490)' },
-      { item: 'Immigration Health Surcharge (IHS)', amount: '₹23,640 (£284/yr est.)' },
+      // IHS: £776/year (2024 rate) × 1 year (MSc) — source: gov.uk/healthcare-immigration-application
+      { item: 'Immigration Health Surcharge (IHS) — 1yr', amount: '₹64,508 (£776/yr)' },
     ],
     postStudyWork: 'Graduate Route: 2 years (3 years for PhD)',
     interviewCities: [],
@@ -72,16 +73,17 @@ const visaData = {
       { doc: 'Proof of funds — £1,334/month London, £1,023/month elsewhere', required: true },
       { doc: 'IELTS Academic (6.0–7.0 depending on university)', required: true },
       { doc: 'Tuberculosis test certificate (mandatory for Indians)', required: true },
-      { doc: 'Poonawala Fincorp Sanction Letter', required: true, isBankDoc: true },
+      // Sanction letter replaces bank statement — accepted by UKVI as proof of funds
+      { doc: 'Poonawala Fincorp Sanction Letter (Proof of Funds)', required: true, isBankDoc: true },
       { doc: 'Parental consent letter (if under 18)', required: false },
     ],
     tips: [
-      'Book your TB test early — specific approved clinics only, takes 1–2 weeks',
+      'Book your TB test early — UKVI-approved clinics only, results take 1–2 weeks',
       'Your CAS number is issued by the university — keep it safe, it expires in 6 months',
-      'Apply online through the UKVI portal; biometrics are collected at a Visa Application Centre',
-      'IHS covers NHS services — no separate health insurance needed for the UK',
+      'Apply online through the UKVI portal; biometrics are collected at a Visa Application Centre (VFS Global)',
+      'IHS (£776/yr) covers full NHS services — you do NOT need separate health insurance for the UK',
     ],
-    loanBenefit: 'UK visa requires evidence of funds for full course fees + living costs. A Poonawala sanction letter covering this amount is accepted as proof.',
+    loanBenefit: 'UK UKVI accepts a sanctioned education loan letter as proof of funds for tuition + maintenance costs (£1,023–£1,334/month). The Poonawala sanction letter covers this requirement directly.',
   },
   'Canada': {
     flag: '🇨🇦',
@@ -101,26 +103,29 @@ const visaData = {
       { doc: 'Letter of Acceptance from a DLI (Designated Learning Institution)', required: true },
       { doc: 'Proof of financial support — ₹12,60,000/year + tuition', required: true },
       { doc: 'Valid passport', required: true },
-      { doc: 'GIC (Guaranteed Investment Certificate) for SDS stream', required: false },
-      { doc: 'IELTS 6.0+ (for SDS fast-track)', required: false },
-      { doc: 'Medical exam (if required)', required: false },
-      { doc: 'Poonawala Fincorp Sanction Letter', required: true, isBankDoc: true },
+      // GIC is the primary financial proof for SDS — sanction letter is supplementary
+      { doc: 'GIC (Guaranteed Investment Certificate) — required for SDS stream', required: true },
+      { doc: 'IELTS 6.0+ (for SDS fast-track 20-day processing)', required: false },
+      { doc: 'Medical exam (if required by IRCC)', required: false },
+      // Sanction letter supplements the GIC but does NOT replace it
+      { doc: 'Poonawala Fincorp Sanction Letter (supplementary)', required: false, isBankDoc: true },
       { doc: 'Biometrics enrollment', required: true },
     ],
     tips: [
-      'SDS (Student Direct Stream) with a GIC + IELTS 6.0+ cuts processing to ~20 days — highly recommended',
-      'Your PGWP duration equals your program length — choose a 2-year program for a 2-year work permit',
+      'SDS (Student Direct Stream) with a GIC + IELTS 6.0+ cuts processing to ~20 days — book as early as possible',
+      'Your PGWP duration equals your program length — a 2-year program gives a 2-year work permit',
       'Apply online via IRCC; biometrics must be given in person at a VAC in India',
-      'Quebec has separate immigration rules — check Arrima portal if studying in Quebec',
+      'Quebec has separate immigration rules — check Arrima portal if studying at a Quebec university',
     ],
-    loanBenefit: 'Canada IRCC accepts bank-issued proof of funds. The Poonawala sanction letter combined with a GIC meets the financial requirement for SDS.',
+    loanBenefit: 'Canada requires a GIC (₹12.6L locked in a Canadian bank account) for SDS. Your Poonawala loan can fund the GIC via disbursement — ask for a direct transfer to your GIC provider.',
   },
   'Germany': {
     flag: '🇩🇪',
     visaType: 'National Student Visa (Type D)',
     authority: 'German Federal Foreign Office',
     officialUrl: 'https://www.studying-in-germany.org/student-visa-for-germany/',
-    color: '#D97706',
+    // Germany uses black (#1D1D1B) not red — distinct from Canada
+    color: '#B45309',
     processingTime: '6–12 weeks',
     fee: '₹6,800',
     feeBreakdown: [
@@ -139,10 +144,10 @@ const visaData = {
       { doc: 'Curriculum Vitae', required: true },
     ],
     tips: [
-      'Germany requires a Blocked Account (Sperrkonto) — open one with Deutsche Bank, Fintiba, or Expatrio early (takes 2–4 weeks)',
-      'Most public German universities charge ZERO tuition — your loan mainly covers living and blocked account costs',
-      'After graduation, you get 18 months to find a job — one of the best post-study work policies in Europe',
-      'The blocked account amount can come from your Poonawala loan disbursement',
+      'Germany requires a Blocked Account (Sperrkonto) — open one with Fintiba or Expatrio early (takes 2–4 weeks to fund)',
+      'Most public German universities charge ZERO tuition — your loan mainly covers the Sperrkonto + living costs',
+      'After graduation, you get 18 months to find a job — the best post-study job-seeking visa in Europe',
+      'Poonawala can disburse directly to your Sperrkonto provider — confirm this at sanction stage',
     ],
     loanBenefit: 'Germany requires a blocked account, not just a sanction letter. The Poonawala loan can be disbursed directly to fund your Sperrkonto.',
   },
@@ -181,7 +186,7 @@ const visaData = {
 const COUNTRY_ORDER = ['United States', 'United Kingdom', 'Canada', 'Germany', 'Australia'];
 
 export default function VisaAssistancePage() {
-  const { profile } = useAppStore();
+  const { profile, loanApplication, setChatOpen } = useAppStore();
 
   // Default to user's target country if available, else US
   const defaultCountry = COUNTRY_ORDER.includes(profile.targetCountry || '')
@@ -190,6 +195,7 @@ export default function VisaAssistancePage() {
 
   const [selectedCountry, setSelectedCountry] = useState(defaultCountry);
   const visa = visaData[selectedCountry as keyof typeof visaData];
+  const loanActive = loanApplication?.submitted === true;
 
   return (
     <div className="page-container">
@@ -404,14 +410,25 @@ export default function VisaAssistancePage() {
             <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 12 }}>
               {visa.loanBenefit}
             </p>
-            <Link href="/apply" style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              padding: '10px 16px', borderRadius: 'var(--radius-md)',
-              background: visa.color, color: 'white', textDecoration: 'none',
-              fontSize: 13, fontWeight: 700,
-            }}>
-              Apply for Loan <ArrowRight size={14} />
-            </Link>
+            {loanActive ? (
+              <Link href="/apply" style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '10px 16px', borderRadius: 'var(--radius-md)',
+                background: '#059669', color: 'white', textDecoration: 'none',
+                fontSize: 13, fontWeight: 700,
+              }}>
+                ✓ View Active Application <ArrowRight size={14} />
+              </Link>
+            ) : (
+              <Link href="/apply" style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '10px 16px', borderRadius: 'var(--radius-md)',
+                background: visa.color, color: 'white', textDecoration: 'none',
+                fontSize: 13, fontWeight: 700,
+              }}>
+                Apply for Loan <ArrowRight size={14} />
+              </Link>
+            )}
           </div>
 
           {/* Visa Timeline */}
@@ -420,32 +437,46 @@ export default function VisaAssistancePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
                 { phase: 'Get Admission', time: 'Month 1', desc: 'Receive offer letter / I-20 / CAS from university' },
-                { phase: 'Apply Loan', time: 'Month 1–2', desc: 'Submit Poonawala application — sanction in 3–5 days' },
-                { phase: 'Gather Docs', time: 'Month 2', desc: 'Compile visa checklist, TB test, financial proofs' },
-                { phase: 'Visa Application', time: 'Month 2–3', desc: 'Submit online application + biometrics / interview' },
-                { phase: 'Visa Decision', time: 'Month 3–4', desc: 'Expect decision within processing window' },
-                { phase: 'Depart', time: 'Month 4–5', desc: 'Arrange accommodation, forex card, insurance' },
-              ].map((step, i, arr) => (
-                <div key={i} style={{ display: 'flex', gap: 12, position: 'relative' }}>
-                  {i !== arr.length - 1 && (
-                    <div style={{ position: 'absolute', left: 11, top: 26, bottom: -8, width: 2, background: 'var(--border)' }} />
-                  )}
-                  <div style={{
-                    width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
-                    background: i < 2 ? visa.color : 'var(--bg-elevated)',
-                    border: `2px solid ${i < 2 ? visa.color : 'var(--border)'}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 10, fontWeight: 800,
-                    color: i < 2 ? 'white' : 'var(--text-muted)',
-                    marginTop: 2,
-                  }}>{i + 1}</div>
-                  <div style={{ paddingBottom: 20 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700 }}>{step.phase}</div>
-                    <div style={{ fontSize: 11, color: visa.color, fontWeight: 600, marginBottom: 2 }}>{step.time}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4 }}>{step.desc}</div>
+                { phase: 'Apply Loan', time: 'Month 1–2', desc: 'Poonawala sanction in 3–5 days — use letter for embassy' },
+                { phase: 'Gather Docs', time: 'Month 2', desc: 'TB test (UK), GIC (Canada), Sperrkonto (Germany), OSHC (AU)' },
+                {
+                  phase: 'Visa Application', time:
+                    selectedCountry === 'Canada' ? 'Month 2–3 (SDS: 1 month)' :
+                    selectedCountry === 'Germany' ? 'Month 3–5' :
+                    selectedCountry === 'United States' ? 'Month 2–3 (slot wait: 3–6 wks)' :
+                    'Month 2–3',
+                  desc: 'Submit online application + biometrics / interview'
+                },
+                { phase: 'Visa Decision', time: selectedCountry === 'Canada' ? 'Month 3–6 (SDS: Month 2)' : 'Month 3–4', desc: `Processing: ${visa.processingTime}` },
+                { phase: 'Depart', time: 'Month 4–6', desc: 'Activate forex card, travel insurance, book accommodation' },
+              ].map((step, i, arr) => {
+                // Steps completed status based on real loanApplication state
+                const stepDone =
+                  i === 0 ? (profile.shortlistedUniversities?.length || 0) > 0 :
+                  i === 1 ? loanActive :
+                  false;
+                return (
+                  <div key={i} style={{ display: 'flex', gap: 12, position: 'relative' }}>
+                    {i !== arr.length - 1 && (
+                      <div style={{ position: 'absolute', left: 11, top: 26, bottom: -8, width: 2, background: stepDone ? visa.color : 'var(--border)' }} />
+                    )}
+                    <div style={{
+                      width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
+                      background: stepDone ? visa.color : 'var(--bg-elevated)',
+                      border: `2px solid ${stepDone ? visa.color : 'var(--border)'}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 10, fontWeight: 800,
+                      color: stepDone ? 'white' : 'var(--text-muted)',
+                      marginTop: 2,
+                    }}>{stepDone ? '✓' : i + 1}</div>
+                    <div style={{ paddingBottom: 20 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: stepDone ? 'var(--text)' : 'var(--text-secondary)' }}>{step.phase}</div>
+                      <div style={{ fontSize: 11, color: stepDone ? visa.color : 'var(--text-muted)', fontWeight: 600, marginBottom: 2 }}>{step.time}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4 }}>{step.desc}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -456,16 +487,24 @@ export default function VisaAssistancePage() {
               <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>AI Copilot Available</span>
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: 10 }}>
-              Ask the AI Copilot specific questions like "What are F-1 visa rejection reasons?" or "How do I write a GTE statement?"
+              Ask the AI Copilot specific questions like &quot;What are {visa.flag} visa rejection reasons?&quot; or &quot;How do I write a GTE statement?&quot;
             </p>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {[`${visa.flag} Visa checklist`, 'Proof of funds help', 'Post-study work rights'].map((q, i) => (
-                <span key={i} style={{
-                  fontSize: 11, fontWeight: 600, padding: '4px 10px',
-                  borderRadius: 'var(--radius-full)', background: 'var(--primary-bg)',
-                  color: 'var(--primary)', border: '1px solid var(--primary-border)',
-                  cursor: 'pointer',
-                }}>{q}</span>
+              {[
+                `${visa.flag} Visa checklist`,
+                'Proof of funds help',
+                'Post-study work rights',
+              ].map((q, i) => (
+                <button
+                  key={i}
+                  onClick={() => setChatOpen(true)}
+                  style={{
+                    fontSize: 11, fontWeight: 600, padding: '4px 10px',
+                    borderRadius: 'var(--radius-full)', background: 'var(--primary-bg)',
+                    color: 'var(--primary)', border: '1px solid var(--primary-border)',
+                    cursor: 'pointer',
+                  }}
+                >{q}</button>
               ))}
             </div>
           </div>

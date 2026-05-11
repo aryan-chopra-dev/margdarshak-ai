@@ -161,7 +161,7 @@ export default function DashboardPage() {
             <div className="section-label" style={{ marginBottom: 12 }}>
               <LayoutDashboard size={14} /> Quick Actions
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
               {quickActions.map(a => (
                 <Link key={a.href} href={a.href} className="card" style={{
                   padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 14,

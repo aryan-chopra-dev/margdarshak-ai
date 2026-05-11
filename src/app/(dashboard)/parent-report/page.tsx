@@ -30,9 +30,11 @@ export default function ParentReportPage() {
   const field = profile.targetField || 'Computer Science';
   const preDegreeAnnualUSD = 4820;
 
-  const favUnis = universities.filter(u => profile.shortlistedUniversities.includes(u.id));
+  // P0 Fix #1 — safe optional chaining so undefined doesn't crash .includes()
+  const favUnis = universities.filter(u => profile.shortlistedUniversities?.includes(u.id));
 
-  if (profile.shortlistedUniversities.length === 0) {
+  // P0 Fix #1 — safe .length check
+  if (!profile.shortlistedUniversities?.length) {
     return (
       <div className="page-container" style={{ textAlign: 'center', padding: '100px 20px' }}>
         <h1 className="page-title">Shortlist Universities First</h1>
@@ -46,18 +48,29 @@ export default function ParentReportPage() {
     );
   }
 
+  // Fix #4 — include living costs in totalCostINR (matches Apply & Repayment pages)
+  const getLivingCost = (country: string) =>
+    country === 'United States' ? 20000 :
+    country === 'United Kingdom' ? 18000 :
+    country === 'Canada' ? 15000 :
+    country === 'Germany' ? 12000 :
+    country === 'India' ? 3000 : 16000;
+
   // --- Build analysis for each shortlisted university ---
   const analyses: UniversityAnalysis[] = favUnis.map(uni => {
     const salary =
       salaryData.find(s => s.field === field && s.country === uni.country) ||
       salaryData.find(s => s.field === field) ||
       salaryData[0]!;
-    const totalCostINR = uni.tuitionUSD * 2 * USD_TO_INR;
+    const programYears = uni.country === 'United Kingdom' ? 1 : 2;
+    const livingCostPerYear = getLivingCost(uni.country);
+    // Fix #4: include living expenses (tuition + living) × years
+    const totalCostINR = (uni.tuitionUSD + livingCostPerYear) * programYears * USD_TO_INR;
     const emi = calculateEMI(totalCostINR, poonawala.interestRateMin, 10);
     const annualSalaryINR = salary.entryLevelUSD * USD_TO_INR;
     const emiToSalaryRatio = (emi.emi / (annualSalaryINR / 12)) * 100;
     const netGain10yr = (salary.midCareerUSD * 10) - (uni.tuitionUSD * 2) - (preDegreeAnnualUSD * 10);
-    const paybackYears = (uni.tuitionUSD * 2) / Math.max(1, salary.entryLevelUSD - preDegreeAnnualUSD);
+    const paybackYears = (uni.tuitionUSD * programYears + livingCostPerYear * programYears) / Math.max(1, salary.entryLevelUSD - preDegreeAnnualUSD);
     // ROI Score: composite of earnings/cost, acceptance potential, and EMI burden
     const roiScore = (uni.medianEarnings10yr || salary.midCareerUSD) / Math.max(1, uni.tuitionUSD / 10) - emiToSalaryRatio;
     return { uni, salary, totalCostINR, emi, roiScore, emiToSalaryRatio, paybackYears, netGain10yr, recommended: false };
@@ -66,10 +79,28 @@ export default function ParentReportPage() {
   // Crown the best: highest ROI Score
   const maxRoi = Math.max(...analyses.map(a => a.roiScore));
   analyses.forEach(a => { a.recommended = a.roiScore === maxRoi; });
-  const recommended = analyses.find(a => a.recommended)!;
+  const recommended = analyses.find(a => a.recommended);
+  // P0 Fix #2 — guard against no recommended (salary data gap)
+  if (!recommended) {
+    return (
+      <div className="page-container" style={{ textAlign: 'center', padding: '100px 20px' }}>
+        <h1 className="page-title">Unable to Score Universities</h1>
+        <p className="page-subtitle" style={{ marginBottom: 32 }}>
+          We couldn&apos;t find salary data for your target field and shortlisted countries. Try selecting a different field in your profile.
+        </p>
+        <Link href="/profile" className="btn-primary" style={{ padding: '12px 24px', fontSize: 16 }}>
+          Update Profile <ArrowRight size={16} />
+        </Link>
+      </div>
+    );
+  }
   const others = analyses.filter(a => !a.recommended);
 
   const reportDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  // Fix #5 — deterministic doc ID (no Math.random() that re-rolls on every render)
+  const docId = String(
+    (recommended.uni.name.charCodeAt(0) * 1117 + new Date().getFullYear() * 31) % 90000 + 10000
+  );
 
   return (
     <div className="page-container hide-nav-on-print">
@@ -99,7 +130,7 @@ export default function ParentReportPage() {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: 9, color: '#9CA3AF' }}>CONFIDENTIAL — Generated {reportDate}</div>
-                <div style={{ fontSize: 9, color: '#9CA3AF' }}>Document #MGD-{Math.floor(Math.random() * 90000) + 10000}</div>
+                <div style={{ fontSize: 9, color: '#9CA3AF' }}>Document #MGD-{docId}</div>
               </div>
             </div>
             <div style={{ height: 2, background: 'linear-gradient(90deg, #4F46E5, #0D9488)' }} />

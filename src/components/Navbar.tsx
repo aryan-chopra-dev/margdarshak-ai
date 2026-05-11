@@ -123,7 +123,7 @@ export default function Navbar() {
               fontSize: 12, fontWeight: 700, color: 'var(--primary-light)',
             }}>
               <Shield size={12} />
-              LRS
+              LRS {lrs?.score ?? '—'}
             </div>
             {/* Avatar */}
             <Link href="/profile" style={{ textDecoration: 'none' }}>

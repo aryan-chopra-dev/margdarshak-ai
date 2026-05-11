@@ -228,29 +228,39 @@ export function calculateEMI(principal: number, annualRate: number, tenureYears:
 // Generate yearly repayment schedule
 export function generateRepaymentSchedule(principal: number, annualRate: number, tenureYears: number) {
   const monthlyRate = annualRate / 12 / 100;
-  const months = tenureYears * 12;
-  const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) /
-              (Math.pow(1 + monthlyRate, months) - 1);
+  const totalMonths = tenureYears * 12;
+  const emi = monthlyRate === 0
+    ? principal / totalMonths
+    : (principal * monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) /
+      (Math.pow(1 + monthlyRate, totalMonths) - 1);
 
-  const schedule = [];
+  const rows = [];
   let balance = principal;
 
-  for (let i = 1; i <= months; i++) {
-    const interestPayment = balance * monthlyRate;
-    const principalPayment = emi - interestPayment;
-    balance -= principalPayment;
+  for (let year = 1; year <= tenureYears; year++) {
+    const openingBalance = balance;
+    let yearPrincipal = 0;
+    let yearInterest = 0;
 
-    if (i % 12 === 0 || i === 1) {
-      schedule.push({
-        month: i,
-        year: Math.ceil(i / 12),
-        emi: Math.round(emi),
-        interest: Math.round(interestPayment),
-        principal: Math.round(principalPayment),
-        balance: Math.max(0, Math.round(balance))
-      });
+    for (let m = 0; m < 12; m++) {
+      const interest = balance * monthlyRate;
+      const princ = Math.min(emi - interest, balance);
+      yearPrincipal += princ;
+      yearInterest += interest;
+      balance = Math.max(0, balance - princ);
+      if (balance === 0) break;
     }
+
+    rows.push({
+      year,
+      openingBalance,
+      principalPaid: yearPrincipal,
+      interestPaid: yearInterest,
+      closingBalance: balance,
+    });
+
+    if (balance === 0) break;
   }
 
-  return schedule;
+  return rows;
 }

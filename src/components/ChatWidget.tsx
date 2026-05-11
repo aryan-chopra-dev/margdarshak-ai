@@ -231,7 +231,8 @@ export default function ChatWidget() {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {quickQuestions.map((q, i) => (
-                <button key={i} onClick={() => { setInput(q); }}
+                <button key={i}
+                  onClick={() => { setInput(q); setTimeout(sendMessage, 0); }}
                   style={{
                     padding: '10px 14px', borderRadius: 'var(--radius-md)',
                     background: 'var(--bg-elevated)', border: '1px solid var(--border)',
@@ -345,13 +346,7 @@ export default function ChatWidget() {
           <Send size={16} color="white" />
         </button>
       </div>
-
-      <style jsx>{`
-        @keyframes pulse {
-          0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
-          40% { transform: scale(1); opacity: 1; }
-        }
-      `}</style>
     </div>
   );
 }
+
