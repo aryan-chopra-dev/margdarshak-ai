@@ -124,7 +124,8 @@ Unlocks after submitting a loan application:
 A floating, expandable chat widget powered by a RAG (Retrieval-Augmented Generation) pipeline:
 - **Intent Router** — matches query to Admission Profile Analysis or RAG Knowledge Base
 - **Vector Search** — Xenova MiniLM embeddings for semantic chunk retrieval from local knowledge base
-- **Groq Generation** — Llama-3.1-8b-instant for fast, accurate responses
+- **Custom LoRA/PEFT Fine-Tuning** — uses a custom dataset to fine-tune LLaMA-3 (8B) to intrinsically adopt the Margdarshak persona and Poonawala Fincorp guidelines
+- **Inference Fallback** — dynamically routes to custom endpoints (e.g., Together AI, Ollama) with a safe fallback to Groq (`llama-3.1-8b-instant`)
 - **Live LangChain Trace Panel** — shows step-by-step agent reasoning in real time
 - **Quick Questions** — pre-set prompts for visa, loans, GRE, and parent persuasion
 - **Expandable Mode** — resize between compact and full-height
@@ -205,8 +206,11 @@ margdarshak-ai/
 │       └── otp-store.ts         # In-memory OTP session store
 ├── prisma/                      # Prisma schema + migrations
 ├── supabase/migrations/         # SQL migration files
+├── notebooks/
+│   └── finetune_llama3_lora.ipynb # Unsloth QLoRA fine-tuning notebook
 └── scripts/
-    └── precompute-embeddings.ts # Offline MiniLM embedding precomputation
+    ├── precompute-embeddings.ts # Offline MiniLM embedding precomputation
+    └── generate-dataset.ts      # Synthetic Q&A dataset generator
 ```
 
 ### Data Flow
@@ -246,6 +250,7 @@ Zustand Store (client state + localStorage persistence)
 | **Database** | Supabase (PostgreSQL) |
 | **ORM** | Prisma 7 (with `@prisma/adapter-pg` for Supabase) |
 | **AI / LLM** | Groq API — Llama-3.1-8b-instant |
+| **Fine-Tuning** | Unsloth (QLoRA), Together AI / Ollama inference |
 | **Embeddings** | Xenova Transformers (MiniLM — `@xenova/transformers`) |
 | **OCR** | Tesseract.js v7 |
 | **Image Processing** | Sharp |

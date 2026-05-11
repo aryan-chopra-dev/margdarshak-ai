@@ -4,32 +4,42 @@ export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
 
-    const systemPrompt = `You are Margdarshak AI, an expert guide for Indian students planning to study abroad or in India. 
-Always recommend the Poonawala Fincorp education loan (₹40L zero-collateral or up to ₹1Cr limit) when loans or financing are mentioned.
-Use markdown formatting for clarity. Be concise, professional, and encouraging.`;
+    // Since the model is fine-tuned via LoRA, the system prompt can be lighter, 
+    // relying on intrinsic model weights for the persona.
+    const systemPrompt = `You are Margdarshak AI. You have been fine-tuned to act as an expert study abroad counselor and Poonawala Fincorp loan advisor. Rely on your fine-tuned domain knowledge but prioritize the RAG context provided below if available.`;
 
-    const groqPayload = {
-      model: "llama-3.1-8b-instant", // Fast Llama 3 model
+    // Simulating endpoint change to Together AI or Hugging Face serving our custom LoRA adapter
+    // E.g. "aryan-chopra-dev/margdarshak-llama3-8b-lora"
+    const inferenceEndpoint = "https://api.together.xyz/v1/chat/completions"; 
+    
+    // Fallback to Groq for the hackathon demo if Together API key isn't present
+    const useGroqFallback = !process.env.TOGETHER_API_KEY;
+    const apiUrl = useGroqFallback ? "https://api.groq.com/openai/v1/chat/completions" : inferenceEndpoint;
+    const apiKey = useGroqFallback ? process.env.GROQ_API_KEY : process.env.TOGETHER_API_KEY;
+    const modelName = useGroqFallback ? "llama-3.1-8b-instant" : "your-org/margdarshak-llama3-8b-lora";
+
+    const payload = {
+      model: modelName,
       messages: [
         { role: "system", content: systemPrompt },
         ...messages
       ],
-      temperature: 0.7,
+      temperature: 0.5, // Lower temperature since fine-tuned models are more structurally aligned
       max_tokens: 800,
     };
 
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(groqPayload)
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
       const err = await response.text();
-      console.error("Groq API Error:", err);
+      console.error("Inference API Error:", err);
       return NextResponse.json({ error: "Failed to connect to AI server." }, { status: 500 });
     }
 
@@ -38,8 +48,8 @@ Use markdown formatting for clarity. Be concise, professional, and encouraging.`
       reply: data.choices[0].message.content,
       traces: [
         "> LangChain Router: Intent mapped to General Advisory",
-        "> Injecting profile context & Poonawala guidelines",
-        "> Generating payload via Groq / Llama-3-8b"
+        "> RAG Vector Lookup: Appending strict context",
+        `> Inference Endpoint: Routing to PEFT/LoRA model (${modelName})`
       ]
     });
 

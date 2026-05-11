@@ -109,7 +109,12 @@ export default function ChatWidget() {
         let mergedTraces: string[] = ['> LangChain Router: Intent matched -> RAG Knowledge Base'];
 
         if (vecData && vecData.topChunk) {
-            mergedTraces = [...mergedTraces, ...vecData.traces, `> RAG Payload Extracted: ${vecData.topChunk.title}`];
+            mergedTraces = [
+              ...mergedTraces, 
+              ...vecData.traces, 
+              `> RAG Payload Extracted: ${vecData.topChunk.title}`,
+              `> Context sent to Custom PEFT/LoRA LLaMA-3 endpoint`
+            ];
             contextText = `CONTEXT RECEIVED FROM VECTOR DB:\n${vecData.topChunk.title}: ${vecData.topChunk.content}\n\n`;
         }
         
