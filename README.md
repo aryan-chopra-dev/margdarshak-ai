@@ -375,7 +375,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## 🎬 Demo
 
 ### Live Demo
-> 🔗 **[https://margdarshak-ai.vercel.app](https://margdarshak-ai.vercel.app)** *(replace with your deployment URL)*
+> 🔗 **[https://margdarshak-ai-ten.vercel.app/](https://margdarshak-ai-ten.vercel.app/)**
 
 ### Demo Walkthrough
 
