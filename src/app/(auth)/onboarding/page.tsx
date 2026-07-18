@@ -79,6 +79,7 @@ export default function OnboardingPage() {
   const { profile, setProfile, setOnboarded, isOnboarded, onboardingDraft, setOnboardingDraft } = useAppStore();
   const [step, setStep] = useState(0);
   const [errors, setErrors] = useState<Errors>({});
+  const [submitError, setSubmitError] = useState('');
   const [form, setForm] = useState({
     name: '', email: '', phone: '',
     targetCountry: '', targetField: '', degree: 'masters' as const,
@@ -104,7 +105,8 @@ export default function OnboardingPage() {
       setForm(f => ({ 
         ...f, 
         name: profile?.name || f.name, 
-        email: profile?.email || f.email 
+        email: profile?.email || f.email ,
+        phone: profile?.phone || f.phone ,
       }));
     }
   }, [isOnboarded, onboardingDraft, profile?.name, profile?.email, router]);
@@ -154,21 +156,28 @@ export default function OnboardingPage() {
       parentPhone: form.parentPhone.trim(),
     };
 
+    setSubmitError('');
     try {
       // Save to database
-      await fetch('/api/profile', {
+      const res = await fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profileData),
       });
-    } catch (e) {
-      console.error("Failed to save profile to DB", e);
-    }
 
-    setProfile(profileData);
-    setOnboarded(true);
-    setOnboardingDraft(undefined); // Clear draft
-    router.push('/dashboard');
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || data.message || 'Failed to save onboarding details.');
+      }
+
+      setProfile(profileData);
+      setOnboarded(true);
+      setOnboardingDraft(undefined); // Clear draft
+      router.push('/dashboard');
+    } catch (e: unknown) {
+      console.error("Failed to save profile to DB", e);
+      setSubmitError(e instanceof Error ? e.message : 'An error occurred while saving your profile. Please try again.');
+    }
   };
 
   const stepDefs = [
@@ -345,6 +354,12 @@ export default function OnboardingPage() {
           </p>
 
           {current.content}
+
+          {submitError && (
+            <div style={{ color: '#EF4444', fontSize: 13, fontWeight: 600, marginTop: 16, textAlign: 'center' }}>
+              {submitError}
+            </div>
+          )}
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 28 }}>
             {step > 0 ? (

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseServerClient } from '@/lib/supabase';
 
 // ============================================================================
 // Register Route — Unified on Supabase Postgres
@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 
 export async function POST(req: Request) {
   try {
+    const supabase = getSupabaseServerClient();
     const { name, email } = await req.json();
 
     if (!email) {

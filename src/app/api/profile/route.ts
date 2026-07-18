@@ -1,30 +1,14 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseServerClient } from '@/lib/supabase';
 import { calculateLRS, UserProfile } from '@/lib/store';
 
-// Helper functions for mapping object keys
-function toSnakeCase(str: string) {
-  return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-}
-
-function toCamelCase(str: string) {
-  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-}
-
-function mapKeys(obj: any, mapper: (key: string) => string) {
-  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return obj;
-  return Object.keys(obj).reduce((acc: any, key) => {
-    acc[mapper(key)] = obj[key];
-    return acc;
-  }, {});
-}
-
 // ============================================================================
-// Profile API — Unified on Supabase Postgres
+// Profile API — Unified & Normalized on Supabase Postgres
 // ============================================================================
 
 export async function POST(req: Request) {
   try {
+    const supabase = getSupabaseServerClient();
     const body = await req.json();
     const { email, ...updates } = body;
 
@@ -32,75 +16,192 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    // Convert camelCase keys from the client to snake_case for Supabase
-    const snakeUpdates = mapKeys(updates, toSnakeCase);
+    // 1. Validate fields before proceeding (defense-in-depth API level checks)
+    if (updates.gpa !== undefined && (updates.gpa < 0 || updates.gpa > 10.0)) {
+      return NextResponse.json({ status: 'error', message: 'GPA must be between 0.0 and 10.0.' }, { status: 400 });
+    }
+    if (updates.greScore !== undefined && updates.greScore !== 0 && (updates.greScore < 260 || updates.greScore > 340)) {
+      return NextResponse.json({ status: 'error', message: 'GRE score must be 0 (if not taken) or between 260 and 340.' }, { status: 400 });
+    }
+    if (updates.toeflScore !== undefined && (updates.toeflScore < 0 || updates.toeflScore > 120)) {
+      return NextResponse.json({ status: 'error', message: 'TOEFL score must be between 0 and 120.' }, { status: 400 });
+    }
+    if (updates.ieltsScore !== undefined && (updates.ieltsScore < 0.0 || updates.ieltsScore > 9.0)) {
+      return NextResponse.json({ status: 'error', message: 'IELTS score must be between 0.0 and 9.0.' }, { status: 400 });
+    }
+    if (updates.workExperience !== undefined && (updates.workExperience < 0 || updates.workExperience > 30)) {
+      return NextResponse.json({ status: 'error', message: 'Work experience must be between 0 and 30 years.' }, { status: 400 });
+    }
+    if (updates.parentIncome !== undefined && (updates.parentIncome < 0 || updates.parentIncome > 100000000)) {
+      return NextResponse.json({ status: 'error', message: 'Parent income cannot exceed 100,000,000 INR.' }, { status: 400 });
+    }
+    if (updates.budget !== undefined && updates.budget < 0) {
+      return NextResponse.json({ status: 'error', message: 'Budget must be greater than or equal to 0.' }, { status: 400 });
+    }
 
-    // SECURE LRS CALCULATION (Server-Side)
-    // 1. Fetch existing profile to compute LRS accurately against all fields
-    const { data: existingProfile, error: fetchError } = await supabase
+    // 2. Fetch the existing normalized profile structure
+    const { data: profileRow, error: fetchError } = await supabase
       .from('profiles')
-      .select('*')
+      .select(`
+        *,
+        academic_scores!left(*),
+        study_targets!left(*),
+        co_applicants!left(*),
+        documents!left(*),
+        shortlisted_universities!left(*)
+      `)
       .eq('email', email)
       .single();
 
-    if (fetchError && fetchError.code !== 'PGRST116') {
-       console.warn('Failed to fetch existing profile for LRS calculation, falling back to updates only', fetchError);
+    if (fetchError || !profileRow) {
+      console.warn('Profile not found for updates:', fetchError);
+      return NextResponse.json({ status: 'error', message: 'Profile not found.' }, { status: 404 });
     }
 
-    // 2. Merge existing DB data with new incoming updates
-    const mergedSnakeProfile = { ...(existingProfile || {}), ...snakeUpdates, email };
+    // Assemble a flat representation of the current state
+    const currentScores  = profileRow.academic_scores || {};
+    const currentTargets = profileRow.study_targets || {};
+    const currentParent  = profileRow.co_applicants || {};
+    const currentDocs    = Array.isArray(profileRow.documents) ? profileRow.documents.map((d: any) => d.name) : [];
+    const currentUnis    = Array.isArray(profileRow.shortlisted_universities) ? profileRow.shortlisted_universities.map((u: any) => u.university_name) : [];
 
-    // 3. Normalize JSONB arrays for the calculation engine
-    const parseJsonbArray = (val: any) => {
-      if (Array.isArray(val)) return val;
-      if (typeof val === 'string') {
-        try { return JSON.parse(val); } catch { return []; }
+    const currentFlatProfile: UserProfile = {
+      name:                    profileRow.name,
+      email:                   profileRow.email,
+      phone:                   profileRow.phone || '',
+      stage:                   currentTargets.stage || 'explorer',
+      targetCountry:           currentTargets.target_country || '',
+      targetField:             currentTargets.target_field || '',
+      degree:                  currentTargets.degree || 'masters',
+      budget:                  currentTargets.budget || 0,
+      gpa:                     currentScores.gpa || 0,
+      greScore:                currentScores.gre_score || 0,
+      toeflScore:              currentScores.toefl_score || 0,
+      ieltsScore:              currentScores.ielts_score || 0,
+      workExperience:          currentScores.work_experience || 0,
+      hasResearch:             currentScores.has_research || false,
+      parentName:              currentParent.name || '',
+      parentPhone:             currentParent.phone || '',
+      parentIncome:            currentParent.income || 0,
+      parentOccupation:        currentParent.occupation || '',
+      docsUploaded:            currentDocs,
+      shortlistedUniversities: currentUnis,
+      kycVerified:             profileRow.kyc_verified || false,
+    };
+
+    // 3. Merge updates
+    const mergedProfile = { ...currentFlatProfile, ...updates };
+
+    // 4. Calculate secure server-side LRS
+    // Accumulate the intent score correctly
+    const intentPoints = Number(updates.intentScore) || 0;
+    const finalIntentScore = Math.min(100, (currentScores.intent_score || 0) + intentPoints);
+    
+    const trueLrs = calculateLRS(mergedProfile, finalIntentScore);
+    const finalLrsScore = trueLrs.score;
+
+    // 5. Update: profiles (core metadata)
+    const profileUpdates: Record<string, any> = { updated_at: new Date().toISOString() };
+    if (updates.name !== undefined) profileUpdates.name = updates.name;
+    if (updates.phone !== undefined) profileUpdates.phone = updates.phone;
+    if (updates.kycVerified !== undefined) profileUpdates.kyc_verified = updates.kycVerified;
+
+    if (Object.keys(profileUpdates).length > 1) {
+      await supabase.from('profiles').update(profileUpdates).eq('id', profileRow.id);
+    }
+
+    // 6. Update: academic_scores
+    const scoresUpdates: Record<string, any> = {
+      profile_id:   profileRow.id,
+      lrs_score:    finalLrsScore,
+      intent_score: finalIntentScore,
+      updated_at:   new Date().toISOString()
+    };
+    if (updates.gpa !== undefined)            scoresUpdates.gpa = updates.gpa;
+    if (updates.greScore !== undefined)       scoresUpdates.gre_score = updates.greScore;
+    if (updates.toeflScore !== undefined)     scoresUpdates.toefl_score = updates.toeflScore;
+    if (updates.ieltsScore !== undefined)     scoresUpdates.ielts_score = updates.ieltsScore;
+    if (updates.workExperience !== undefined) scoresUpdates.work_experience = updates.workExperience;
+    if (updates.hasResearch !== undefined)    scoresUpdates.has_research = updates.hasResearch;
+
+    await supabase.from('academic_scores').upsert(scoresUpdates, { onConflict: 'profile_id' });
+
+    // 7. Update: study_targets
+    const targetsUpdates: Record<string, any> = {
+      profile_id: profileRow.id,
+      updated_at: new Date().toISOString()
+    };
+    if (updates.stage !== undefined)         targetsUpdates.stage = updates.stage;
+    if (updates.targetCountry !== undefined) targetsUpdates.target_country = updates.targetCountry;
+    if (updates.targetField !== undefined)   targetsUpdates.target_field = updates.targetField;
+    if (updates.degree !== undefined)        targetsUpdates.degree = updates.degree;
+    if (updates.budget !== undefined)        targetsUpdates.budget = updates.budget;
+
+    await supabase.from('study_targets').upsert(targetsUpdates, { onConflict: 'profile_id' });
+
+    // 8. Update: co_applicants
+    const parentUpdates: Record<string, any> = {
+      profile_id: profileRow.id,
+      updated_at: new Date().toISOString()
+    };
+    let hasParentUpdate = false;
+    if (updates.parentName !== undefined) { parentUpdates.name = updates.parentName; hasParentUpdate = true; }
+    if (updates.parentPhone !== undefined) { parentUpdates.phone = updates.parentPhone; hasParentUpdate = true; }
+    if (updates.parentIncome !== undefined) { parentUpdates.income = updates.parentIncome; hasParentUpdate = true; }
+    if (updates.parentOccupation !== undefined) { parentUpdates.occupation = updates.parentOccupation; hasParentUpdate = true; }
+
+    if (hasParentUpdate) {
+      await supabase.from('co_applicants').upsert(parentUpdates, { onConflict: 'profile_id' });
+    }
+
+    // 9. Update: shortlisted_universities (sync mapping)
+    if (updates.shortlistedUniversities !== undefined && Array.isArray(updates.shortlistedUniversities)) {
+      const newUnis: string[] = updates.shortlistedUniversities;
+      // Delete missing shortlists
+      await supabase.from('shortlisted_universities')
+        .delete()
+        .eq('profile_id', profileRow.id)
+        .not('university_name', 'in', `(${newUnis.map(u => `"${u}"`).join(',') || '""'})`);
+      
+      // Insert new ones
+      for (const uniName of newUnis) {
+        if (!currentUnis.includes(uniName)) {
+          await supabase.from('shortlisted_universities').upsert({
+            profile_id: profileRow.id,
+            university_name: uniName
+          }, { onConflict: 'profile_id,university_name' });
+        }
       }
-      return [];
+    }
+
+    // 10. Update: documents (sync mapping)
+    if (updates.docsUploaded !== undefined && Array.isArray(updates.docsUploaded)) {
+      const newDocs: string[] = updates.docsUploaded;
+      // Delete missing documents
+      await supabase.from('documents')
+        .delete()
+        .eq('profile_id', profileRow.id)
+        .not('name', 'in', `(${newDocs.map(d => `"${d}"`).join(',') || '""'})`);
+
+      // Insert new ones
+      for (const docName of newDocs) {
+        if (!currentDocs.includes(docName)) {
+          await supabase.from('documents').insert({
+            profile_id: profileRow.id,
+            name: docName
+          });
+        }
+      }
+    }
+
+    // Compile and return the newly saved profile state
+    const resultProfile = {
+      ...mergedProfile,
+      lrsScore: finalLrsScore,
+      intentScore: finalIntentScore,
     };
 
-    // 4. Map to UserProfile format expected by calculateLRS
-    const camelMergedProfile = mapKeys(mergedSnakeProfile, toCamelCase) as UserProfile;
-    camelMergedProfile.shortlistedUniversities = parseJsonbArray(camelMergedProfile.shortlistedUniversities);
-    camelMergedProfile.docsUploaded = parseJsonbArray(camelMergedProfile.docsUploaded);
-
-    // 5. Calculate the TRUE score dynamically based on the verified backend state
-    const intent = Number(mergedSnakeProfile.intent_score) || 0;
-    const trueLrs = calculateLRS(camelMergedProfile, intent);
-
-    // 6. Hard override the lrs_score from the client to prevent manipulation vulnerabilities
-    snakeUpdates.lrs_score = trueLrs.score;
-
-    const updatePayload: Record<string, unknown> = {
-      ...snakeUpdates,
-      updated_at: new Date().toISOString(),
-    };
-
-    // Parse legacy string arrays if necessary
-    if (typeof updatePayload.shortlisted_universities === 'string') {
-      try { updatePayload.shortlisted_universities = JSON.parse(updatePayload.shortlisted_universities as string); }
-      catch { updatePayload.shortlisted_universities = []; }
-    }
-    if (typeof updatePayload.docs_uploaded === 'string') {
-      try { updatePayload.docs_uploaded = JSON.parse(updatePayload.docs_uploaded as string); }
-      catch { updatePayload.docs_uploaded = []; }
-    }
-
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .update(updatePayload)
-      .eq('email', email)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Profile Update Error (Supabase):', error);
-      return NextResponse.json({ status: 'error', message: 'Failed to update profile' }, { status: 500 });
-    }
-
-    // Map the returned row back to camelCase for the client
-    const camelProfile = mapKeys(profile, toCamelCase);
-    return NextResponse.json({ status: 'success', profile: camelProfile });
+    return NextResponse.json({ status: 'success', profile: resultProfile });
 
   } catch (error) {
     console.error('Profile Update Error:', error);
@@ -110,6 +211,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    const supabase = getSupabaseServerClient();
     const { searchParams } = new URL(req.url);
     const email = searchParams.get('email');
 
@@ -117,13 +219,20 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    const { data: profile, error } = await supabase
+    const { data: profileRow, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select(`
+        *,
+        academic_scores!left(*),
+        study_targets!left(*),
+        co_applicants!left(*),
+        documents!left(*),
+        shortlisted_universities!left(*)
+      `)
       .eq('email', email)
       .single();
 
-    if (error || !profile) {
+    if (error || !profileRow) {
       if (error?.code === 'PGRST116') {
         return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
       }
@@ -131,25 +240,44 @@ export async function GET(req: Request) {
       return NextResponse.json({ status: 'error', message: 'Failed to fetch profile' }, { status: 500 });
     }
 
-    // Map Supabase snake_case row back to camelCase for the client
-    const camelProfile = mapKeys(profile, toCamelCase);
+    // Map nested relational data back to flat UserProfile expected by client
+    const scores  = profileRow.academic_scores || {};
+    const targets = profileRow.study_targets || {};
+    const parent  = profileRow.co_applicants || {};
+    const docs    = Array.isArray(profileRow.documents) ? profileRow.documents.map((d: any) => d.name) : [];
+    const unis    = Array.isArray(profileRow.shortlisted_universities) ? profileRow.shortlisted_universities.map((u: any) => u.university_name) : [];
 
-    // Defensively ensure arrays
-    const parsedProfile = {
-      ...camelProfile,
-      shortlistedUniversities: Array.isArray(camelProfile.shortlistedUniversities)
-        ? camelProfile.shortlistedUniversities
-        : (() => { try { return JSON.parse(camelProfile.shortlistedUniversities || '[]'); } catch { return []; } })(),
-      docsUploaded: Array.isArray(camelProfile.docsUploaded)
-        ? camelProfile.docsUploaded
-        : (() => { try { return JSON.parse(camelProfile.docsUploaded || '[]'); } catch { return []; } })(),
+    const camelProfile = {
+      id:                      profileRow.id,
+      email:                   profileRow.email,
+      name:                    profileRow.name,
+      phone:                   profileRow.phone || '',
+      stage:                   targets.stage || 'explorer',
+      targetCountry:           targets.target_country || '',
+      targetField:             targets.target_field || '',
+      degree:                  targets.degree || 'masters',
+      budget:                  targets.budget || 0,
+      gpa:                     scores.gpa || 0,
+      greScore:                scores.gre_score || 0,
+      toeflScore:              scores.toefl_score || 0,
+      ieltsScore:              scores.ielts_score || 0,
+      workExperience:          scores.work_experience || 0,
+      hasResearch:             scores.has_research || false,
+      lrsScore:                scores.lrs_score || 300,
+      intentScore:             scores.intent_score || 0,
+      parentName:              parent.name || '',
+      parentPhone:             parent.phone || '',
+      parentIncome:            parent.income || 0,
+      parentOccupation:        parent.occupation || '',
+      docsUploaded:            docs,
+      shortlistedUniversities: unis,
+      kycVerified:             profileRow.kyc_verified || false,
     };
 
-    return NextResponse.json({ status: 'success', profile: parsedProfile });
+    return NextResponse.json({ status: 'success', profile: camelProfile });
 
   } catch (error) {
     console.error('Profile Fetch Error:', error);
     return NextResponse.json({ status: 'error', message: 'Failed to fetch profile' }, { status: 500 });
   }
 }
-

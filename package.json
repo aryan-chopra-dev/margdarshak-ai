@@ -7,7 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "precompute": "npx tsx scripts/precompute-embeddings.ts"
+    "precompute": "npx tsx scripts/precompute-embeddings.ts",
+    "test": "npx tsx tests/run-all.ts",
+    "test:func": "npx tsx tests/run-all.ts",
+    "test:load": "k6 run tests/k6/load-test.js",
+    "test:pool": "npx tsx tests/connection-pool/pool-stress.ts",
+    "test:explain": "npx tsx tests/non-functional/10-explain-analyze.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.17.3",

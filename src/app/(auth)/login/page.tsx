@@ -12,12 +12,14 @@ export default function LoginPage() {
   const { login } = useAppStore();
 
   const [step, setStep] = useState<'details' | 'otp' | 'done'>('details');
+  const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [delivery, setDelivery] = useState<'email' | 'demo'>('demo');
   const [countdown, setCountdown] = useState(0);
 
@@ -30,18 +32,23 @@ export default function LoginPage() {
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !phone.trim()) {
-      setError('Email and phone number are required.');
+    if (!email.trim()) {
+      setError('Email address is required.');
+      return;
+    }
+    if (!isLogin && (!name.trim() || !phone.trim())) {
+      setError('Name, email, and phone number are required for registration.');
       return;
     }
     setLoading(true);
     setError('');
+    setSuccess('');
 
     try {
       const res = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name || 'Student', email, phone }),
+        body: JSON.stringify({ name: name || 'Student', email, phone, isLogin }),
       });
 
       const data = await res.json();
@@ -65,16 +72,29 @@ export default function LoginPage() {
     if (otp.length < 6) { setError('Enter the 6-digit OTP.'); return; }
     setLoading(true);
     setError('');
+    setSuccess('');
 
     try {
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name || 'Student', email, phone, otp }),
+        body: JSON.stringify({ name: name || 'Student', email, phone, otp, isLogin }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Verification failed.');
+
+      if (data.registered) {
+        // Registration complete: clear fields, set Sign In tab, and redirect back to login step
+        setSuccess('Account created successfully! Please sign in using your email.');
+        setIsLogin(true);
+        setStep('details');
+        setOtp('');
+        setName('');
+        setPhone('');
+        setLoading(false);
+        return;
+      }
 
       // Step 1: Set auth identity in Zustand
       login(data.profile.name, data.profile.email, data.profile.phone || phone);
@@ -171,6 +191,67 @@ export default function LoginPage() {
           {step === 'done' && 'All set! Redirecting...'}
         </p>
 
+        {/* Login / Register Toggle Tabs */}
+        {step === 'details' && (
+          <div style={{
+            display: 'flex',
+            background: 'var(--bg-elevated)',
+            padding: 4,
+            borderRadius: 'var(--radius-md)',
+            marginBottom: 24,
+            border: '1.5px solid var(--border)'
+          }}>
+            <button
+              type="button"
+              onClick={() => { setIsLogin(true); setError(''); setSuccess(''); }}
+              style={{
+                flex: 1,
+                padding: '10px 0',
+                border: 'none',
+                borderRadius: 'calc(var(--radius-md) - 2px)',
+                cursor: 'pointer',
+                fontSize: 13,
+                fontWeight: 700,
+                background: isLogin ? 'var(--primary)' : 'transparent',
+                color: isLogin ? 'white' : 'var(--text-secondary)',
+                transition: 'all 0.2s',
+              }}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => { setIsLogin(false); setError(''); setSuccess(''); }}
+              style={{
+                flex: 1,
+                padding: '10px 0',
+                border: 'none',
+                borderRadius: 'calc(var(--radius-md) - 2px)',
+                cursor: 'pointer',
+                fontSize: 13,
+                fontWeight: 700,
+                background: !isLogin ? 'var(--primary)' : 'transparent',
+                color: !isLogin ? 'white' : 'var(--text-secondary)',
+                transition: 'all 0.2s',
+              }}
+            >
+              Create Account
+            </button>
+          </div>
+        )}
+
+        {/* Success message banner */}
+        {success && (
+          <div style={{
+            padding: '12px 16px', marginBottom: 20, borderRadius: 10,
+            background: 'rgba(16,185,129,0.1)', color: 'var(--success)',
+            fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
+            border: '1px solid rgba(16,185,129,0.2)',
+          }}>
+            <CheckCircle2 size={15} /> {success}
+          </div>
+        )}
+
         {/* Error */}
         {error && (
           <div style={{
@@ -183,19 +264,21 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* ── Step 1: Details ── */}
+         {/* ── Step 1: Details ── */}
         {step === 'details' && (
           <form onSubmit={handleSendOtp} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-            <div>
-              <label style={labelStyle}>Your Name</label>
-              <div style={{ position: 'relative' }}>
-                <User size={17} color="var(--text-muted)" style={iconStyle} />
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)}
-                  placeholder="Rahul Sharma" style={inputStyle}
-                  onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
-                  onBlur={(e) => (e.target.style.borderColor = 'var(--border)')} />
+            {!isLogin && (
+              <div>
+                <label style={labelStyle}>Your Name <span style={{ color: '#EF4444' }}>*</span></label>
+                <div style={{ position: 'relative' }}>
+                  <User size={17} color="var(--text-muted)" style={iconStyle} />
+                  <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+                    placeholder="Rahul Sharma" required={!isLogin} style={inputStyle}
+                    onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+                    onBlur={(e) => (e.target.style.borderColor = 'var(--border)')} />
+                </div>
               </div>
-            </div>
+            )}
 
             <div>
               <label style={labelStyle}>Email Address <span style={{ color: '#EF4444' }}>*</span></label>
@@ -208,19 +291,21 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div>
-              <label style={labelStyle}>Mobile Number <span style={{ color: '#EF4444' }}>*</span></label>
-              <div style={{ position: 'relative' }}>
-                <Phone size={17} color="var(--text-muted)" style={iconStyle} />
-                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+91 98765 43210" required style={inputStyle}
-                  onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
-                  onBlur={(e) => (e.target.style.borderColor = 'var(--border)')} />
+            {!isLogin && (
+              <div>
+                <label style={labelStyle}>Mobile Number <span style={{ color: '#EF4444' }}>*</span></label>
+                <div style={{ position: 'relative' }}>
+                  <Phone size={17} color="var(--text-muted)" style={iconStyle} />
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+91 98765 43210" required={!isLogin} style={inputStyle}
+                    onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+                    onBlur={(e) => (e.target.style.borderColor = 'var(--border)')} />
+                </div>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
+                  OTP will be sent to your email. Phone is saved for your profile.
+                </p>
               </div>
-              <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
-                OTP will be sent to your email. Phone is saved for your profile.
-              </p>
-            </div>
+            )}
 
             <button type="submit" disabled={loading} className="btn btn-primary"
               style={{ width: '100%', height: 48, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, fontSize: 15, marginTop: 4 }}>

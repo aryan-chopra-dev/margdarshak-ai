@@ -1,13 +1,20 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseServerClient } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const { data: profiles, error } = await supabase
-      .from('profiles')
-      .select('name, lrs_score')
+    const supabase = getSupabaseServerClient();
+    // Fetch leaderboard scores joining profiles table
+    const { data: records, error } = await supabase
+      .from('academic_scores')
+      .select(`
+        lrs_score,
+        profiles (
+          name
+        )
+      `)
       .order('lrs_score', { ascending: false })
       .limit(10);
 
@@ -16,7 +23,13 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch leaderboard' }, { status: 500 });
     }
 
-    return NextResponse.json({ status: 'success', data: profiles });
+    // Map nested data to flat structures expected by frontend
+    const mappedLeaderboard = (records || []).map((r: any) => ({
+      name: r.profiles?.name || 'Student',
+      lrs_score: r.lrs_score
+    }));
+
+    return NextResponse.json({ status: 'success', data: mappedLeaderboard });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

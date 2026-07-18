@@ -1,24 +1,48 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseServerClient } from '@/lib/supabase';
 
 export async function POST(req: Request) {
   try {
-    const { email, phone, name } = await req.json();
+    const supabase = getSupabaseServerClient();
+    const { email, phone, name, isLogin } = await req.json();
 
-    if (!email || !phone) {
-      return NextResponse.json({ error: 'Email and phone are required.' }, { status: 400 });
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required.' }, { status: 400 });
+    }
+
+    if (!isLogin && !phone) {
+      return NextResponse.json({ error: 'Mobile number is required for registration.' }, { status: 400 });
+    }
+
+    // ── Registration/Login account existence checks (via secure RPC to bypass RLS) ──
+    const { data: profileExists, error: rpcError } = await supabase
+      .rpc('check_profile_exists', { target_email: email });
+
+    if (rpcError) {
+      console.error('Supabase RPC check_profile_exists error:', rpcError);
+      return NextResponse.json({ error: 'Auth system check failed.' }, { status: 500 });
+    }
+
+    if (isLogin) {
+      if (!profileExists) {
+        return NextResponse.json({ error: 'Account not found. Please register first.' }, { status: 404 });
+      }
+    } else {
+      if (profileExists) {
+        return NextResponse.json({ error: 'Email already registered. Please log in.' }, { status: 400 });
+      }
     }
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expires_at = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
-    // Store OTP in Supabase (upsert by email+phone)
+    // Store OTP in Supabase (upsert by email)
     const { error: dbError } = await supabase
       .from('otp_verifications')
       .upsert(
-        { email, phone, otp, expires_at },
-        { onConflict: 'email,phone' }
+        { email, otp, expires_at },
+        { onConflict: 'email' }
       );
 
     if (dbError) {

@@ -9,7 +9,7 @@ import {
   ExternalLink, Maximize2, Minimize2
 } from 'lucide-react';
 
-const USD_TO_INR = 83;
+const USD_TO_INR = 95;
 
 function generateResponse(query: string, profile: any): { response: string, steps: string[] } {
   // Simulate LangChain Orchestrator Routing
