@@ -6,8 +6,8 @@ import {
 } from 'lucide-react';
 
 const stats = [
-  { value: '₹1 Cr',  label: 'Max Loan Amount',   sub: 'Poonawala Fincorp',    color: '#6366F1' },
-  { value: '11.25%', label: 'Starting Rate p.a.', sub: 'Reducing balance',     color: '#8B5CF6' },
+  { value: '₹2 Cr',  label: 'Max Loan Amount',   sub: 'Partner Lenders',    color: '#6366F1' },
+  { value: '8.50%',  label: 'Starting Rate p.a.', sub: 'Reducing balance',     color: '#8B5CF6' },
   { value: '30+',    label: 'Universities',        sub: 'Across 8 countries',   color: '#06B6D4' },
   { value: '60s',    label: 'Time to Apply',       sub: 'AI auto-fill OCR',     color: '#10B981' },
 ];
@@ -30,9 +30,9 @@ const features = [
 ];
 
 const loanStats = [
-  { val: '11.25%', label: 'Starting rate p.a.', color: '#6366F1' },
-  { val: '₹1 Cr',  label: 'Maximum loan',       color: '#10B981' },
-  { val: 'Nil',    label: 'Collateral ≤ ₹40L',  color: '#8B5CF6' },
+  { val: '8.50%',  label: 'Starting rate p.a.', color: '#6366F1' },
+  { val: '₹2 Cr',  label: 'Maximum loan',       color: '#10B981' },
+  { val: 'Nil',    label: 'Zero Collateral Options',  color: '#8B5CF6' },
   { val: '15 yr',  label: 'Max tenure',          color: '#06B6D4' },
 ];
 
@@ -85,7 +85,7 @@ export default function LandingPage() {
 
             <p style={{ fontSize: 17, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 36, maxWidth: 480 }}>
               Margdarshak AI combines real university data, salary projections, and
-              Poonawala Fincorp education loans into a single intelligent platform.
+              flexible education loan options into a single intelligent platform.
             </p>
 
             <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 32 }}>
@@ -134,7 +134,7 @@ export default function LandingPage() {
           maxWidth: 1200, margin: '0 auto',
           display: 'flex', justifyContent: 'center', gap: 40, alignItems: 'center', flexWrap: 'wrap',
         }}>
-          {['US Dept. of Education', 'QS Rankings 2025', 'NIRF India 2024', 'Poonawala Fincorp', 'BLS OEWS', 'Kaggle Admissions ML'].map(label => (
+          {['US Dept. of Education', 'QS Rankings 2025', 'NIRF India 2024', 'Lender Guidelines', 'BLS OEWS', 'Kaggle Admissions ML'].map(label => (
             <span key={label} style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.02em' }}>
               {label}
             </span>
@@ -222,7 +222,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── POONAWALA / LOAN CTA ── */}
+      {/* ── LENDER / LOAN CTA ── */}
       <section style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 32px' }}>
         <div style={{
           borderRadius: 'var(--radius-xl)',
@@ -241,21 +241,21 @@ export default function LandingPage() {
           }} />
 
           <div style={{ position: 'relative' }}>
-            <div className="section-label" style={{ marginBottom: 12 }}>Poonawala Fincorp</div>
+            <div className="section-label" style={{ marginBottom: 12 }}>Education Loans</div>
             <h2 style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 14, color: 'var(--heading)' }}>
               Education loans up to{' '}
               <span style={{
                 background: 'linear-gradient(135deg, #6366F1, #10B981)',
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-              }}>₹1 Crore</span>
+              }}>₹2 Crore</span>
             </h2>
             <p style={{ fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 28 }}>
-              Starting at 11.25% p.a. with zero collateral up to ₹40 Lakhs.
+              Starting at 8.50% p.a. with zero collateral options for select premier programs.
               Moratorium during study period and tax benefits under Section 80E.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 32 }}>
               {[
-                'RBI-registered NBFC with ₹25,000+ Cr AUM',
+                'RBI-registered leading lenders and public banks',
                 'Up to 15-year repayment tenure',
                 'Covers tuition + living + travel expenses',
                 'Interest deductible under Section 80E',
@@ -293,7 +293,7 @@ export default function LandingPage() {
         background: 'var(--bg-elevated)',
       }}>
         <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-          Margdarshak AI · Powered by Poonawala Fincorp
+          Margdarshak AI · Your Higher Education Companion
         </p>
         <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, opacity: 0.7 }}>
           Data: US DOE · QS Rankings 2025 · NIRF 2024 · BLS OEWS · RBI

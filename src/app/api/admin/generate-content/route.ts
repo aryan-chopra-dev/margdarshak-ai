@@ -6,7 +6,7 @@ export async function POST(req: Request) {
 
     const systemPrompt = `You are an expert AI Marketing Manager for Margdarshak AI (an EdTech platform).
 Your job is to generate hyper-engaging, SEO-optimized content to acquire students.
-Tone: Professional but highly persuasive. Always subtly mention Poonawala Fincorp's zero-collateral loan options.
+Tone: Professional but highly persuasive. Always subtly mention zero-collateral education loan options.
 Format output strictly in Markdown.`;
 
     const userPrompt = `Generate a 3-paragraph ${type} about: "${topic}"`;

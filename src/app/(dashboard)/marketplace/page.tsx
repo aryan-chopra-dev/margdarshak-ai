@@ -7,31 +7,17 @@ import { useState, useEffect } from 'react';
 
 const lenders = [
   {
-    id: 'poonawala',
-    name: 'Poonawala Fincorp',
-    type: 'Premium NBFC',
-    icon: <Compass color="var(--primary)" size={24} />,
-    color: 'var(--primary)',
-    maxLimit: '₹1 Crore',
-    apr: '11.25%',
-    collateral: 'Zero Collateral Required',
-    moratorium: 'Course + 6 Months',
-    processingFee: '1% + GST',
-    approvalTime: '3-5 Days',
-    minLRS: 450, // Highly accessible
-  },
-  {
     id: 'hdfc',
     name: 'HDFC Credila',
-    type: 'NBFC',
+    type: 'Premium NBFC',
     icon: <Landmark color="#1d4ed8" size={24} />,
     color: '#1d4ed8',
-    maxLimit: '₹60 Lakhs',
-    apr: '11.75%',
-    collateral: 'Required for > ₹40L',
-    moratorium: 'Course + 6 Months',
-    processingFee: '1.25% + GST',
-    approvalTime: '7-10 Days',
+    maxLimit: '₹2 Crore',
+    apr: '11.00%',
+    collateral: 'Required for > ₹7.5L',
+    moratorium: 'Course + 12 Months',
+    processingFee: '1% + GST',
+    approvalTime: '5-7 Days',
     minLRS: 600,
   },
   {
@@ -87,19 +73,19 @@ export default function MarketplacePage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         {lenders.map(lender => {
           const isEligible = lrs.score >= lender.minLRS;
-          const isPoonawala = lender.id === 'poonawala';
+          const isFeatured = lender.id === 'hdfc';
 
           return (
             <div key={lender.id} className="card-hover" style={{ 
               display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 2fr 200px', 
               gap: 24, padding: 32, 
-              border: isPoonawala ? '2px solid var(--primary-border)' : '1px solid var(--border)',
-              background: isPoonawala ? 'var(--primary-bg)' : 'var(--bg-card)',
+              border: isFeatured ? '2px solid var(--primary-border)' : '1px solid var(--border)',
+              background: isFeatured ? 'var(--primary-bg)' : 'var(--bg-card)',
               position: 'relative', overflow: 'hidden'
             }}>
               
-              {/* Poonawala Ribbon */}
-              {isPoonawala && (
+              {/* Featured Ribbon */}
+              {isFeatured && (
                 <div style={{
                   position: 'absolute', top: 16, right: -40, background: 'var(--grad-primary)',
                   color: 'white', fontSize: 11, fontWeight: 800, padding: '4px 48px',
@@ -145,7 +131,7 @@ export default function MarketplacePage() {
                 </div>
                 <div>
                   <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>Collateral Constraint</p>
-                  <p style={{ fontSize: 14, fontWeight: isPoonawala ? 700 : 500, color: isPoonawala ? 'var(--success)' : 'var(--text-primary)' }}>
+                  <p style={{ fontSize: 14, fontWeight: isFeatured ? 700 : 500, color: isFeatured ? 'var(--success)' : 'var(--text-primary)' }}>
                     {lender.collateral}
                   </p>
                 </div>
@@ -163,7 +149,7 @@ export default function MarketplacePage() {
                     opacity: isEligible ? 1 : 0.5,
                     filter: !isEligible ? 'grayscale(100%)' : 'none'
                   }}>
-                    {isPoonawala ? 'Fast-Track Apply' : 'Standard Apply'}
+                    {isFeatured ? 'Fast-Track Apply' : 'Standard Apply'}
                   </button>
                 </Link>
               </div>

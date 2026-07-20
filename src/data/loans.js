@@ -3,8 +3,7 @@
 // REAL LOAN DATA — All figures from verified public sources
 // ============================================================================
 // Sources:
-//   Poonawala Fincorp: poonawallafincorp.com/education-loan.php
-//     → Confirmed: "up to ₹1 Cr @ 11.25% p.a." (page title + meta description)
+// Sources:
 //   Credila (HDFC): credila.com (public rate card)
 //   Prodigy Finance: prodigyfinance.com (public terms)
 //   SBI: sbi.co.in/web/personal-banking/loans/education-loans
@@ -15,36 +14,6 @@ exports.loanProducts = void 0;
 exports.calculateEMI = calculateEMI;
 exports.generateRepaymentSchedule = generateRepaymentSchedule;
 exports.loanProducts = [
-    {
-        id: "poonawala",
-        lender: "Poonawala Fincorp",
-        type: "nbfc",
-        // From poonawallafincorp.com meta: "@ 11.25% p.a.*"
-        interestRateMin: 11.25,
-        interestRateMax: 14.00,
-        // From page title: "up to ₹1 Cr"
-        maxLoanAmountINR: 10000000,
-        processingFee: "Up to 2% + GST",
-        collateralRequired: "No collateral for select programs",
-        moratoriumMonths: 12,
-        maxTenureYears: 10,
-        domesticLoans: true,
-        abroadLoans: true,
-        processingTimeDays: "3-5 business days",
-        features: [
-            "Education loan up to ₹1 Crore",
-            "Starting at 11.25% p.a.*",
-            "Instant approval with minimal docs",
-            "Flexible EMI repayment options",
-            "Moratorium period during study",
-            "RBI registered NBFC (CIN verified)",
-            "Online application process",
-            "Study abroad + domestic coverage"
-        ],
-        highlighted: true,
-        dataSource: "Poonawalla Fincorp Official Website (confirmed Apr 2026)",
-        sourceUrl: "https://www.poonawallafincorp.com/education-loan.php"
-    },
     {
         id: "credila",
         lender: "Credila Financial Services (HDFC)",
@@ -66,6 +35,7 @@ exports.loanProducts = [
             "Co-applicant mandatory",
             "Covers tuition + living + travel"
         ],
+        highlighted: true,
         dataSource: "Credila Official Website",
         sourceUrl: "https://www.credila.com"
     },

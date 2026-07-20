@@ -35,6 +35,27 @@ export default function DashboardPage() {
       router.replace('/onboarding');
       return;
     }
+    // Sync latest user profile and active loan from DB
+    if (profile?.email) {
+      fetch(`/api/profile?email=${encodeURIComponent(profile.email)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success' && data.profile) {
+            const { setProfile, setLoanApplication } = useAppStore.getState();
+            setProfile({
+              role: data.profile.role,
+              roleStatus: data.profile.roleStatus,
+              gpa: data.profile.gpa,
+              shortlistedUniversities: data.profile.shortlistedUniversities || [],
+              docsUploaded: data.profile.docsUploaded || [],
+              kycVerified: data.profile.kycVerified || false,
+            });
+            setLoanApplication(data.profile.loanApplication || null);
+          }
+        })
+        .catch(console.error);
+    }
+
     // Only run these once when dashboard mounts and user is onboarded
     updateLRS();
     checkStreak();
@@ -149,6 +170,42 @@ export default function DashboardPage() {
             whiteSpace: 'nowrap', flexShrink: 0,
           }}>
             View Repayment <ArrowRight size={14} />
+          </Link>
+        </div>
+      )}
+
+      {/* Document upload nudge — shown when docs are incomplete and no active loan */}
+      {!loanApplication?.submitted && (!profile?.docsUploaded || profile.docsUploaded.length < 4) && (
+        <div style={{
+          marginBottom: 24, padding: '16px 24px',
+          background: 'linear-gradient(135deg, rgba(217,119,6,0.08) 0%, rgba(245,158,11,0.05) 100%)',
+          border: '1px solid rgba(217,119,6,0.25)',
+          borderRadius: 'var(--radius-lg)', color: 'var(--text)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 10, background: 'rgba(217,119,6,0.1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              <Shield size={20} color="var(--warning)" />
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--warning)', marginBottom: 2 }}>
+                Documents Required for Loan Application
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                {profile?.docsUploaded?.length || 0} of 4 documents uploaded — complete your profile to apply for a loan.
+              </div>
+            </div>
+          </div>
+          <Link href="/profile" style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px',
+            background: 'var(--warning)', borderRadius: 'var(--radius-full)',
+            color: 'white', textDecoration: 'none', fontSize: 12, fontWeight: 700,
+            whiteSpace: 'nowrap', flexShrink: 0,
+          }}>
+            Upload Now <ArrowRight size={14} />
           </Link>
         </div>
       )}

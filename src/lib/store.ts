@@ -27,6 +27,9 @@ export interface UserProfile {
   docsUploaded: string[];
   // KYC
   kycVerified: boolean;
+  // Role & Admin approvals
+  role?: string;
+  roleStatus?: string;
 }
 
 export interface LRSState {
@@ -94,6 +97,7 @@ interface AppState {
     principalINR: number;
     submittedAt: string;    // ISO date string
     referenceId: string;
+    status?: string;
   } | null;
   setLoanApplication: (app: NonNullable<AppState['loanApplication']>) => void;
   clearLoanApplication: () => void;
@@ -196,6 +200,7 @@ export const useAppStore = create<AppState>()(
         intentScore: 0,
         streakDays: 0,
         chatHistory: [],
+        loanApplication: null,
       }),
       
       profile: defaultProfile,

@@ -14,6 +14,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Mobile number is required for registration.' }, { status: 400 });
     }
 
+    if (!isLogin) {
+      const cleanPhone = phone.replace(/[\s\-\+]/g, '');
+      const last10 = cleanPhone.slice(-10);
+      if (last10.length !== 10 || !/^[6-9]\d{9}$/.test(last10)) {
+        return NextResponse.json({ error: 'Please enter a valid 10-digit Indian phone number.' }, { status: 400 });
+      }
+    }
+
     // ── Registration/Login account existence checks (via secure RPC to bypass RLS) ──
     const { data: profileExists, error: rpcError } = await supabase
       .rpc('check_profile_exists', { target_email: email });

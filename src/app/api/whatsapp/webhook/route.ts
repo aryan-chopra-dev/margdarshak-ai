@@ -22,8 +22,8 @@ export async function POST(req: Request) {
       replyText = "Here is a personalized GRE study plan based on your target score of 320+. I've also emailed you 3 full-length Mock tests.";
     } else if (msgLower.includes('delay') || msgLower.includes('postpone')) {
       replyText = "Got it! I will push your 'Take GRE Exam' milestone by 15 days in your master timeline and adjust your university deadlines automatically.";
-    } else if (msgLower.includes('loan') || msgLower.includes('poonawala')) {
-      replyText = "Your Loan Readiness Score (LRS) is currently 680. You are eligible for the Poonawala Fincorp ₹40L zero-collateral option. Want me to start the application?";
+    } else if (msgLower.includes('loan')) {
+      replyText = "Your Loan Readiness Score (LRS) is currently 680. You are eligible for zero-collateral options up to ₹40L from our partner NBFCs. Want me to start the application?";
     }
 
     console.log(`> LangChain Router Generated Reply: "${replyText}"`);

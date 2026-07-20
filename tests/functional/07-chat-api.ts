@@ -38,8 +38,8 @@ async function test() {
 
   const testMessages = [
     {
-      label:    'Simple question about Poonawala loan rates',
-      messages: [{ role: 'user', content: 'What is the Poonawala Fincorp education loan interest rate?' }],
+      label:    'Simple question about Credila loan rates',
+      messages: [{ role: 'user', content: 'What is the HDFC Credila education loan interest rate?' }],
     },
     {
       label:    'GRE score question (RAG routing)',

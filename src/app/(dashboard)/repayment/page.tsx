@@ -43,6 +43,48 @@ export default function RepaymentDashboardPage() {
     );
   }
 
+  // === GATE: Pending Admin Approval ===
+  if (loanApplication.status === 'pending') {
+    return (
+      <div className="page-container" style={{ textAlign: 'center', paddingTop: 160 }}>
+        <div style={{
+          width: 80, height: 80, borderRadius: '50%', margin: '0 auto 24px',
+          background: 'rgba(217, 119, 6, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Clock size={40} color="#D97706" />
+        </div>
+        <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12 }}>Loan Sanction Pending Approval</h1>
+        <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 460, margin: '0 auto 32px', lineHeight: 1.6 }}>
+          Your application <strong>#{loanApplication.referenceId}</strong> has been submitted. It is currently in queue awaiting admin verification and sanction. We will notify you once approved.
+        </p>
+        <div className="tag tag-warning" style={{ display: 'inline-flex', padding: '8px 16px', fontSize: 13 }}>
+          Status: Awaiting Admin Review
+        </div>
+      </div>
+    );
+  }
+
+  // === GATE: Rejected by Admin ===
+  if (loanApplication.status === 'rejected') {
+    return (
+      <div className="page-container" style={{ textAlign: 'center', paddingTop: 160 }}>
+        <div style={{
+          width: 80, height: 80, borderRadius: '50%', margin: '0 auto 24px',
+          background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <X size={40} color="#EF4444" />
+        </div>
+        <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12 }}>Loan Sanction Declined</h1>
+        <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 460, margin: '0 auto 32px', lineHeight: 1.6 }}>
+          We regret to inform you that your loan application has been declined during administrative audit. Please review your Loan Readiness Score factors and try again with alternative options.
+        </p>
+        <Link href="/apply" className="btn-primary" style={{ padding: '14px 32px', fontSize: 15 }}>
+          Re-apply for Loan <ArrowRight size={16} />
+        </Link>
+      </div>
+    );
+  }
+
   // === Derive all values from the persisted loanApplication ===
   const topUni = universities.find(u => profile.shortlistedUniversities?.includes(u.id))
     || universities.find(u => u.name === loanApplication.universityName)

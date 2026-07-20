@@ -21,17 +21,7 @@ export const scholarships = [
       tags: ['Leadership', 'Full Ride', 'UK'],
       url: 'https://www.chevening.org/scholarship/india/'
     },
-    {
-      id: 'sch_3',
-      name: 'Poonawala Merit Grant',
-      provider: 'Poonawala Fincorp',
-      targetCountry: 'Global',
-      amount: '₹5,00,000 Flat Grant',
-      eligibility: 'Pre-approved loan applicants demonstrating exceptional academic LRS scores (>750).',
-      deadline: 'Rolling',
-      tags: ['LRS Conditional', 'Grant', 'Global'],
-      url: 'https://poonawallafincorp.com/'
-    },
+
     {
       id: 'sch_4',
       name: 'Erasmus Mundus Joint Masters',

@@ -88,7 +88,7 @@ async function test() {
     const timeoutRes = await fetch(`${BASE_URL}/api/chat`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ messages: [{ role: 'user', content: 'What is Poonawala loan rate?' }] }),
+      body:    JSON.stringify({ messages: [{ role: 'user', content: 'What is Credila loan rate?' }] }),
       signal:  controller.signal,
     });
     timeoutStatus = timeoutRes.status;

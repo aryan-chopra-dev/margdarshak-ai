@@ -36,9 +36,17 @@ export default function LoginPage() {
       setError('Email address is required.');
       return;
     }
-    if (!isLogin && (!name.trim() || !phone.trim())) {
-      setError('Name, email, and phone number are required for registration.');
-      return;
+    if (!isLogin) {
+      if (!name.trim() || !phone.trim()) {
+        setError('Name, email, and phone number are required for registration.');
+        return;
+      }
+      const cleanPhone = phone.replace(/[\s\-\+]/g, '');
+      const last10 = cleanPhone.slice(-10);
+      if (last10.length !== 10 || !/^[6-9]\d{9}$/.test(last10)) {
+        setError('Please enter a valid 10-digit Indian phone number.');
+        return;
+      }
     }
     setLoading(true);
     setError('');
@@ -107,7 +115,7 @@ export default function LoginPage() {
         if (profileRes.ok) {
           const profileData = await profileRes.json();
           if (profileData.profile) {
-            const { setProfile, setOnboarded } = useAppStore.getState();
+            const { setProfile, setOnboarded, setLoanApplication } = useAppStore.getState();
             setProfile({
               gpa: profileData.profile.gpa || 0,
               greScore: profileData.profile.greScore || 0,
@@ -127,7 +135,10 @@ export default function LoginPage() {
               parentIncome: profileData.profile.parentIncome || 0,
               parentOccupation: profileData.profile.parentOccupation || '',
               kycVerified: profileData.profile.kycVerified || false,
+              role: profileData.profile.role || 'user',
+              roleStatus: profileData.profile.roleStatus || 'approved',
             });
+            setLoanApplication(profileData.profile.loanApplication || null);
             // Mark as onboarded if the saved profile has meaningful data
             if (profileData.profile.targetCountry || profileData.profile.gpa > 0) {
               setOnboarded(true);

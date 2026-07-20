@@ -26,7 +26,7 @@ interface UniversityAnalysis {
 
 export default function ParentReportPage() {
   const { profile } = useAppStore();
-  const poonawala = loanProducts.find(l => l.id === 'poonawala')!;
+  const defaultLoan = loanProducts.find(l => l.id === 'credila') || loanProducts[0]!;
   const field = profile.targetField || 'Computer Science';
   const preDegreeAnnualUSD = 4820;
 
@@ -66,7 +66,7 @@ export default function ParentReportPage() {
     const livingCostPerYear = getLivingCost(uni.country);
     // Fix #4: include living expenses (tuition + living) × years
     const totalCostINR = (uni.tuitionUSD + livingCostPerYear) * programYears * USD_TO_INR;
-    const emi = calculateEMI(totalCostINR, poonawala.interestRateMin, 10);
+    const emi = calculateEMI(totalCostINR, defaultLoan.interestRateMin, 10);
     const annualSalaryINR = salary.entryLevelUSD * USD_TO_INR;
     const emiToSalaryRatio = (emi.emi / (annualSalaryINR / 12)) * 100;
     const netGain10yr = (salary.midCareerUSD * 10) - (uni.tuitionUSD * 2) - (preDegreeAnnualUSD * 10);
@@ -126,7 +126,7 @@ export default function ParentReportPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.15em', color: '#4F46E5', textTransform: 'uppercase' }}>Margdarshak AI</div>
-                <div style={{ fontSize: 9, color: '#6B7280', letterSpacing: '0.06em' }}>Powered by Poonawala Fincorp</div>
+                <div style={{ fontSize: 9, color: '#6B7280', letterSpacing: '0.06em' }}>Your Higher Education Financing Companion</div>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: 9, color: '#9CA3AF' }}>CONFIDENTIAL — Generated {reportDate}</div>
@@ -192,7 +192,7 @@ export default function ParentReportPage() {
               <div className="doc-highlight-box doc-highlight-blue">
                 <div className="doc-highlight-number">₹{recommended.emi.emi.toLocaleString('en-IN')}</div>
                 <div className="doc-highlight-label">Monthly EMI (recommended)</div>
-                <div className="doc-highlight-sub">Poonawala Fincorp @ {poonawala.interestRateMin}% for 10 yrs</div>
+                <div className="doc-highlight-sub">{defaultLoan.lender} @ {defaultLoan.interestRateMin}% for 10 yrs</div>
               </div>
               <div className="doc-highlight-box doc-highlight-purple">
                 <div className="doc-highlight-number">{recommended.paybackYears.toFixed(1)} yrs</div>
@@ -393,7 +393,7 @@ export default function ParentReportPage() {
                   <tbody>
                     <tr><td className="doc-inner-td-label">Total Program Cost</td><td className="doc-inner-td-val">₹{Math.round(recommended.totalCostINR / 100000).toLocaleString('en-IN')} Lakhs</td></tr>
                     <tr><td className="doc-inner-td-label">Loan Amount</td><td className="doc-inner-td-val">₹{Math.round(recommended.totalCostINR / 100000).toLocaleString('en-IN')} Lakhs</td></tr>
-                    <tr><td className="doc-inner-td-label">Interest Rate</td><td className="doc-inner-td-val">{poonawala.interestRateMin}% p.a. (reducing)</td></tr>
+                    <tr><td className="doc-inner-td-label">Interest Rate</td><td className="doc-inner-td-val">{defaultLoan.interestRateMin}% p.a. (reducing)</td></tr>
                     <tr><td className="doc-inner-td-label">Tenure</td><td className="doc-inner-td-val">10 years post moratorium</td></tr>
                     <tr><td className="doc-inner-td-label">Monthly EMI</td><td className="doc-inner-td-val" style={{ fontWeight: 800, color: '#4F46E5' }}>₹{recommended.emi.emi.toLocaleString('en-IN')}</td></tr>
                     <tr><td className="doc-inner-td-label">Total Interest Paid</td><td className="doc-inner-td-val">₹{Math.round(recommended.emi.totalInterest / 100000).toLocaleString('en-IN')} Lakhs</td></tr>
@@ -439,7 +439,7 @@ export default function ParentReportPage() {
             <div className="doc-section-title"><Shield size={12} style={{ marginRight: 6 }} />Lender Credibility & Risk Mitigation</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               {[
-                { icon: '🏛️', title: 'RBI-Registered NBFC', desc: 'Poonawala Fincorp is a publicly listed, RBI-regulated NBFC with ₹25,000+ Cr AUM and 10+ years of operations.' },
+                { icon: '🏛️', title: 'RBI-Registered NBFCs', desc: 'Our lending partners are RBI-registered, leading NBFCs with strong credibility, regulated interest rates, and robust compliance.' },
                 { icon: '📋', title: 'Moratorium Period', desc: 'No EMI is due during the course. Repayment begins only after course completion + 6 months — reducing immediate pressure.' },
                 { icon: '💸', title: 'Tax Benefit (80E)', desc: 'All interest paid on education loans is 100% tax-deductible for 8 years, reducing the effective cost of borrowing.' },
                 { icon: '🌐', title: 'Comprehensive Coverage', desc: 'Loan covers tuition, living expenses, travel, and study materials — eliminating hidden financing gaps.' },
@@ -509,7 +509,7 @@ export default function ParentReportPage() {
                   {[
                     { name: 'Merit-Based Scholarships', benefit: 'Up to ₹20,00,000/yr', note: 'Based on GPA + GRE' },
                     { name: 'Need-Based Aid', benefit: 'Up to ₹12,00,000/yr', note: 'Family income assessed' },
-                    { name: 'Poonawala Top-up', benefit: '₹50,000 cashback', note: 'On loan disbursement' },
+                    { name: 'Lender Cashbacks', benefit: 'Up to ₹50,000 cashback', note: 'On select disbursement tiers' },
                     { name: 'Marketplace Savings', benefit: '5% on forex/travel', note: 'Via Margdarshak' },
                   ].map((s, i) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', background: '#F9FAFB', borderRadius: 5, border: '1px solid #E5E7EB' }}>
@@ -565,7 +565,7 @@ export default function ParentReportPage() {
             </div>
             <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.6)', borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: 10, marginTop: 4 }}>
               This report is generated by Margdarshak AI using verified data from US Dept. of Education, BLS, HESA, NIRF, and StatsCan.
-              Loan terms are subject to credit assessment by Poonawala Fincorp Ltd. This does not constitute financial advice.
+              Loan terms are subject to credit assessment by the respective lending partner. This does not constitute financial advice.
             </div>
           </div>
         </div>
@@ -574,7 +574,7 @@ export default function ParentReportPage() {
         <div className="doc-footer hide-on-print-footer">
           <div style={{ height: 2, background: 'linear-gradient(90deg, #4F46E5, #0D9488)', marginBottom: 10 }} />
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 8, color: '#9CA3AF' }}>
-            <span>Margdarshak AI — Powered by Poonawala Fincorp</span>
+            <span>Margdarshak AI — Your Higher Education Companion</span>
             <span>Generated {reportDate} — Confidential</span>
           </div>
         </div>

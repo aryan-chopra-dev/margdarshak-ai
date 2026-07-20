@@ -4,8 +4,8 @@ import AuthGuard from "@/components/AuthGuard";
 
 export const metadata: Metadata = {
   title: "Margdarshak AI — Your AI Guide to Higher Education & Loan Readiness",
-  description: "AI-powered student engagement platform that guides Indian students through university discovery, admission prep, and education loan applications. Built for Poonawala Fincorp.",
-  keywords: ["education loan", "study abroad", "AI career navigator", "university rankings", "Poonawala Fincorp", "loan readiness score"],
+  description: "AI-powered student engagement platform that guides Indian students through university discovery, admission prep, and education loan applications.",
+  keywords: ["education loan", "study abroad", "AI career navigator", "university rankings", "loan readiness score"],
 };
 
 // Inline script to apply saved theme BEFORE first paint — prevents flash

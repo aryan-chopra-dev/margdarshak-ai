@@ -26,7 +26,7 @@ export default function B2BMonetizationDashboard() {
 
       {/* Core Revenue KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 32 }}>
-        <KpiCard title="Qualified Loan Leads" value="8,402" icon={Users} trend={+14.2} subtext="Sent to Poonawala Fincorp" />
+        <KpiCard title="Qualified Loan Leads" value="8,402" icon={Users} trend={+14.2} subtext="Sent to Partner Lenders" />
         <KpiCard title="Projected Commission" value="₹12.4 Cr" icon={IndianRupee} trend={+22.5} subtext="At 1.5% disbursement avg" />
         <KpiCard title="Premium Subscribers" value="3,205" icon={Briefcase} trend={+8.4} subtext="₹1,499/mo Tier" />
         <KpiCard title="B2B Affiliates (Ancillary)" value="₹2.4 Cr" icon={FileCheck} trend={-2.1} subtext="Test Prep, Insurance, Forex" />
@@ -37,7 +37,7 @@ export default function B2BMonetizationDashboard() {
         {/* Loan Funnel Visualization */}
         <div className="card-static" style={{ padding: 24 }}>
           <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <TrendingUp size={18} color="var(--primary)" /> Margdarshak → Poonawala Funnel
+            <TrendingUp size={18} color="var(--primary)" /> Margdarshak → NBFC Partner Commission
           </h3>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

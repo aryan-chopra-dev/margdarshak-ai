@@ -60,7 +60,7 @@ export default function LoanScorePage() {
       <div className="section-label"><Shield size={14} /> Loan Readiness Score</div>
       <h1 className="page-title">Your Loan Readiness Score</h1>
       <p className="page-subtitle" style={{ marginBottom: 40 }}>
-        Build your score to 700+ to unlock pre-approved loan offers from Poonawala Fincorp
+        Build your score to 700+ to unlock pre-approved loan offers from our lending partners
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>

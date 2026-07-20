@@ -318,7 +318,7 @@ export default function ROICalculatorPage() {
 
           {/* EMI Details */}
           <div className="card-static" style={{ padding: 28 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Loan EMI Summary (Poonawala Fincorp)</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Loan EMI Summary</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
               <div style={{ padding: 14, borderRadius: 'var(--radius-md)', background: 'var(--bg-elevated)' }}>
                 <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Principal</div>
@@ -338,7 +338,7 @@ export default function ROICalculatorPage() {
               </div>
             </div>
             <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 12 }}>
-              Rate from poonawallafincorp.com/education-loan.php — starting at 11.25% p.a.
+              Indicative rate card based on leading education loan lenders starting at 11.25% p.a.
             </p>
           </div>
         </div>

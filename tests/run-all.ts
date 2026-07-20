@@ -39,6 +39,7 @@ const tests = [
   { id: '09', name: 'Circuit Breaker Simulation',     type: 'Non-Functional' as const, file: 'non-functional/09-circuit-breaker.ts' },
   { id: '10', name: 'EXPLAIN ANALYZE (Query Plan)',   type: 'Non-Functional' as const, file: 'non-functional/10-explain-analyze.ts' },
   { id: '11', name: 'Cache Simulation & Latency',     type: 'Non-Functional' as const, file: 'non-functional/11-cache-simulation.ts' },
+  { id: '12', name: 'Stress & Load Test (1K VUs)',    type: 'Non-Functional' as const, file: 'non-functional/12-stress-load-test.ts' },
 ];
 
 function runTest(testDef: typeof tests[0]): TestResult {

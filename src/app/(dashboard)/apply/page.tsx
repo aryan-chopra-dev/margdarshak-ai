@@ -14,13 +14,57 @@ const steps = ['Upload Document', 'Verify Details', 'Choose Lender', 'Submit'];
 export default function ApplyPage() {
   const { profile, lrs, addIntentEvent, setLoanApplication, loanApplication } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
-  const [selectedLender, setSelectedLender] = useState('poonawala');
+  const [selectedLender, setSelectedLender] = useState('credila');
   const [submitted, setSubmitted] = useState(false);
   
   const [ocrLoading, setOcrLoading] = useState(false);
   const [ocrProgress, setOcrProgress] = useState(0);
   const [ocrError, setOcrError] = useState('');
   const [debugRawOcr, setDebugRawOcr] = useState('');
+
+  const hasShortlisted = profile.shortlistedUniversities && profile.shortlistedUniversities.length > 0;
+
+  if (!hasShortlisted) {
+    return (
+      <div className="page-container" style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center', paddingTop: 80 }}>
+        <div style={{
+          width: 80, height: 80, borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px'
+        }}>
+          <Shield size={40} color="#EF4444" />
+        </div>
+        <h1 className="page-title" style={{ fontSize: 24 }}>Shortlist Required</h1>
+        <p className="page-subtitle" style={{ marginBottom: 32 }}>
+          You must shortlist at least one university under the Career Navigator before applying for an education loan. This allows us to calculate accurate tuition rates and map eligible lenders.
+        </p>
+        <Link href="/career-navigator" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 28px', textDecoration: 'none' }}>
+          Go to Career Navigator <ArrowRight size={18} />
+        </Link>
+      </div>
+    );
+  }
+
+  const allDocsUploaded = profile.docsUploaded && profile.docsUploaded.length === 4;
+
+  if (!allDocsUploaded) {
+    return (
+      <div className="page-container" style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center', paddingTop: 80 }}>
+        <div style={{
+          width: 80, height: 80, borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px'
+        }}>
+          <Upload size={40} color="#EF4444" />
+        </div>
+        <h1 className="page-title" style={{ fontSize: 24 }}>Documents Upload Required</h1>
+        <p className="page-subtitle" style={{ marginBottom: 32 }}>
+          You must upload all 4 required documents (Academic Transcript, Passport Copy, Test Score Report, and Admit Letter) in your Profile Settings before you can apply for a loan.
+        </p>
+        <Link href="/profile" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 28px', textDecoration: 'none' }}>
+          Go to Profile Settings <ArrowRight size={18} />
+        </Link>
+      </div>
+    );
+  }
 
   const topUni = universities.find(u => profile.shortlistedUniversities?.includes(u.id)) || universities[0];
   const USD_TO_INR = 83;
@@ -101,19 +145,44 @@ export default function ApplyPage() {
 
   const lender = loanProducts.find(l => l.id === selectedLender) || loanProducts[0];
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const refId = 'PF-' + Math.floor(1000 + Math.random() * 9000) + '-' + Math.floor(100 + Math.random() * 900);
-    setLoanApplication({
-      submitted: true,
+    const payload = {
+      email: profile.email,
       lenderId: selectedLender,
       lenderName: lender.lender,
       universityName: formData.university || topUni.name,
       principalINR: loanAmount,
-      submittedAt: new Date().toISOString(),
       referenceId: refId,
-    });
-    setSubmitted(true);
-    addIntentEvent(30);
+    };
+
+    try {
+      const res = await fetch('/api/loans/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to submit loan application.');
+      }
+
+      setLoanApplication({
+        submitted: true,
+        lenderId: selectedLender,
+        lenderName: lender.lender,
+        universityName: formData.university || topUni.name,
+        principalINR: loanAmount,
+        submittedAt: new Date().toISOString(),
+        referenceId: refId,
+        status: 'pending',
+      });
+      setSubmitted(true);
+      addIntentEvent(30);
+    } catch (err: any) {
+      alert(err.message || 'Error submitting application');
+    }
   };
 
   // --- Rehydrate from store if already submitted ---
@@ -143,7 +212,9 @@ export default function ApplyPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <span style={{ fontSize: 12, fontWeight: 700, padding: '4px 10px', background: 'rgba(255,255,255,0.2)', borderRadius: 20 }}>
-                    🟢 Pending Sanction
+                    {loanApplication.status === 'approved' ? '🟢 Sanctioned & Approved' : 
+                     loanApplication.status === 'rejected' ? '🔴 Declined' : 
+                     '🟡 Pending Admin Approval'}
                   </span>
                   <h2 style={{ fontSize: 22, fontWeight: 800, marginTop: 16 }}>Ref: #{loanApplication.referenceId}</h2>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, opacity: 0.9, fontSize: 14 }}>

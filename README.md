@@ -1,6 +1,6 @@
 # 🎓 Margdarshak AI
 ### *Your AI-Powered Study Abroad & Education Finance Companion*
-> **Powered by Poonawala Fincorp** — Built for the Meta × Poonawala Fincorp Hackathon 2026
+> **Study Abroad & Education Finance Companion** — Built for the Meta Hackathon 2026
 
 <div align="center">
 
@@ -25,7 +25,7 @@ Every year, **~700,000 Indian students** aspire to study abroad. The journey fro
 | **Financing Anxiety** | 60% of loan applications stall because parents are not convinced early enough |
 | **Post-Sanction Chaos** | After loan approval, students have no unified system to track disbursements, visas, or EMIs |
 
-**Margdarshak AI** solves all three with a single, intelligent platform — combining a proprietary **Loan Readiness Score (LRS)**, an **AI Chat Copilot**, data-driven financial projections, and a **Parent Persuasion Engine** — all natively integrated with Poonawala Fincorp's education loan products.
+**Margdarshak AI** solves all three with a single, intelligent platform — combining a proprietary **Loan Readiness Score (LRS)**, an **AI Chat Copilot**, data-driven financial projections, and a **Parent Persuasion Engine** — all natively integrated with partner NBFC education loan products.
 
 ---
 
@@ -71,7 +71,7 @@ A financial-grade investment model backed by real data:
 - **3 Economic Scenarios** — Optimistic, Realistic, Conservative (with distinct salary growth multipliers, tax rates, and inflation)
 - **Data Sources** — US Bureau of Labor Statistics (BLS), HESA (UK), NIRF (India), PayScale
 - **Salary Trajectory** — Entry → Mid-Career → Senior level mapped per field and country
-- **EMI Integration** — Poonawala Fincorp loan terms (rate, tenure) baked into cash flow model
+- **EMI Integration** — Partner lender loan terms (rate, tenure) baked into cash flow model
 - **Scholarship Slider** — Adjustable 0–80% scholarship impact on total cost
 
 ### 🎯 Admission Predictor
@@ -124,7 +124,7 @@ Unlocks after submitting a loan application:
 A floating, expandable chat widget powered by a RAG (Retrieval-Augmented Generation) pipeline:
 - **Intent Router** — matches query to Admission Profile Analysis or RAG Knowledge Base
 - **Vector Search** — Xenova MiniLM embeddings for semantic chunk retrieval from local knowledge base
-- **Custom LoRA/PEFT Fine-Tuning** — uses a custom dataset to fine-tune LLaMA-3 (8B) to intrinsically adopt the Margdarshak persona and Poonawala Fincorp guidelines
+- **Custom LoRA/PEFT Fine-Tuning** — uses a custom dataset to fine-tune LLaMA-3 (8B) to intrinsically adopt the Margdarshak persona and education loan guidelines
 - **Inference Fallback** — dynamically routes to custom endpoints (e.g., Together AI, Ollama) with a safe fallback to Groq (`llama-3.1-8b-instant`)
 - **Live LangChain Trace Panel** — shows step-by-step agent reasoning in real time
 - **Quick Questions** — pre-set prompts for visa, loans, GRE, and parent persuasion
@@ -143,7 +143,7 @@ A floating, expandable chat widget powered by a RAG (Retrieval-Augmented Generat
 - Community engagement module for peer interaction
 
 ### 🔧 Admin Dashboard (`/admin`)
-- B2B monetization panel for Poonawala Fincorp administrators
+- B2B monetization panel for platform administrators
 - Platform analytics and application funnel visibility
 
 ### 🌙 Theme Support
@@ -195,7 +195,7 @@ margdarshak-ai/
 │   ├── data/
 │   │   ├── universities.ts      # University database (QS, tuition, acceptance, earnings)
 │   │   ├── salaries.ts          # BLS/HESA salary data by field + country
-│   │   ├── loans.ts             # Poonawala loan products + EMI/amortization math
+│   │   ├── loans.ts             # Partner loan products + EMI/amortization math
 │   │   ├── scholarships.ts      # Scholarship database
 │   │   ├── admissions.ts        # Admission probability data
 │   │   └── knowledge-base.ts    # RAG knowledge chunks + MiniLM vector retrieval
@@ -285,7 +285,7 @@ Financial-grade education investment analysis with real BLS/HESA salary data.
 ### Parent Report — Investment Dossier
 A 4-page printable PDF investment case to present to parents and co-applicants.
 
-> *University comparison matrix, AI recommendation rationale, 10-year financial projection, Section 80E tax benefit, Poonawala Fincorp credibility section.*
+> *University comparison matrix, AI recommendation rationale, 10-year financial projection, Section 80E tax benefit, partner lender credibility section.*
 
 ---
 
@@ -393,7 +393,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 7. **Loan Score** → upload mock documents to boost your LRS to 700+
 8. **Apply for Loan** → submit a mock application
 9. **Repayment Dashboard** → track EMI schedule and pre-departure checklist
-10. **Chat Copilot** → ask "What is Poonawala's education loan rate?" and watch the RAG traces
+10. **Chat Copilot** → ask "What is the HDFC Credila education loan rate?" and watch the RAG traces
 
 ### Sample Credentials for Demo
 ```
@@ -424,15 +424,15 @@ Field:    Computer Science
 - [ ] **University Application Tracker** — Track application status per university (Submitted → Interview → Decision)
 
 ### Finance & Lender Integration
-- [ ] **Live Lender API Integration** — Real-time loan eligibility check via Poonawala Fincorp's loan origination system
+- [ ] **Live Lender API Integration** — Real-time loan eligibility check via partner loan origination systems
 - [ ] **eKYC Integration** — Aadhaar/DigiLocker-based identity verification
 - [ ] **Co-applicant Portal** — Separate login for parents to view and co-sign the application
 - [ ] **Dynamic Interest Rate Engine** — Real-time rate adjustment based on LRS, CIBIL, and university tier
-- [ ] **Loan Comparison Engine** — Compare Poonawala with HDFC Credila, Avanse, and public sector banks
+- [ ] **Loan Comparison Engine** — Compare HDFC Credila, Avanse, and public sector banks
 
 ### Platform & Scale
 - [ ] **B2B API** — Expose LRS and university matching as an API for EdTech partners and counselors
-- [ ] **Analytics Dashboard** — Conversion funnel for Poonawala Fincorp's sales team
+- [ ] **Analytics Dashboard** — Conversion funnel for partner sales teams
 - [ ] **A/B Testing Framework** — Experiment with onboarding flows and nudge messaging
 - [ ] **Offline Mode** — PWA with service worker for low-connectivity regions
 - [ ] **Referral Program** — Peer-to-peer referral with LRS bonus points
@@ -441,7 +441,7 @@ Field:    Computer Science
 
 ## 👥 Team
 
-Built with ❤️ for the **Meta × Poonawala Fincorp Hackathon 2026**.
+Built with ❤️ for the **Meta Hackathon 2026**.
 
 ---
 
@@ -453,7 +453,7 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 ## 🙏 Acknowledgements
 
-- **Poonawala Fincorp** — Education loan products, rate data, and business context
+
 - **US Bureau of Labor Statistics (BLS)** — Salary benchmarks by field and level
 - **HESA (UK)** — Higher education statistics for salary projections
 - **QS World University Rankings 2025** — University ranking data

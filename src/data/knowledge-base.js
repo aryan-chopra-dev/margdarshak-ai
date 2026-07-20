@@ -66,13 +66,13 @@ exports.knowledgeBase = [
     },
     // ---- EDUCATION LOAN INFORMATION ----
     {
-        id: "loan-poonawala",
+        id: "loan-hdfc-credila",
         category: "Loans",
-        title: "Poonawala Fincorp Education Loan Details",
-        content: "Poonawala Fincorp offers education loans up to \u20B91 Crore starting at 11.25% p.a. for study abroad programs. Key features: (1) No collateral required for select programs, (2) Covers tuition fees + living expenses + travel costs, (3) Moratorium period during course duration + 6 months, (4) EMI starts after moratorium, (5) Flexible tenure up to 10 years, (6) Quick disbursal in 3-5 business days, (7) Minimal documentation required, (8) Online application available. Processing fee: Up to 2% + GST. Poonawala Fincorp is an RBI-registered NBFC. Programs covered include MBA, MS, Engineering, Medicine, and other PG programs at recognized institutions worldwide.",
-        keywords: ["poonawala education loan", "poonawala fincorp", "education loan 1 crore", "11.25 percent", "nbfc education loan"],
-        source: "Poonawalla Fincorp Official Website",
-        sourceUrl: "https://www.poonawallafincorp.com/education-loan.php",
+        title: "HDFC Credila Education Loan Details",
+        content: "HDFC Credila offers education loans up to \u20B92 Crore starting at 11.00% p.a. for study abroad programs. Key features: (1) Partially-collateralized options, (2) Covers tuition fees + living expenses + travel costs, (3) Moratorium period during course duration + 12 months, (4) EMI starts after moratorium, (5) Flexible tenure up to 15 years, (6) Quick disbursal in 5-7 business days, (7) Minimal documentation required, (8) Online application available. HDFC Credila is an RBI-registered NBFC. Programs covered include MBA, MS, Engineering, Medicine, and other PG programs at recognized institutions worldwide.",
+        keywords: ["hdfc credila education loan", "hdfc credila", "education loan 2 crore", "11 percent", "nbfc education loan"],
+        source: "HDFC Credila Official Website",
+        sourceUrl: "https://www.credila.com",
         lastVerified: "2026-04"
     },
     {
@@ -89,7 +89,7 @@ exports.knowledgeBase = [
         id: "loan-comparison-tips",
         category: "Loans",
         title: "How to Choose Between Bank and NBFC Education Loans",
-        content: "Bank vs NBFC education loans: Banks (SBI, BOB) offer lower interest rates (8.5-10.5%) but require collateral above \u20B97.5L and take 2-4 weeks to process. NBFCs (Poonawala, Credila, Auxilo) charge higher rates (11-15%) but offer faster processing (3-7 days), no-collateral options for select programs, and simpler documentation. Key factors to compare: (1) Interest rate \u2014 fixed vs floating, (2) Processing fee \u2014 can be 0-2%, (3) Collateral requirement and threshold, (4) Maximum loan amount, (5) Moratorium period, (6) Repayment tenure flexibility, (7) Prepayment/foreclosure charges, (8) Insurance bundling. Tip: Apply to both a bank and an NBFC simultaneously \u2014 use the bank loan as backup while the NBFC processes faster.",
+        content: "Bank vs NBFC education loans: Banks (SBI, BOB) offer lower interest rates (8.5-10.5%) but require collateral above \u20B97.5L and take 2-4 weeks to process. NBFCs (Credila, Auxilo, Avanse) charge higher rates (11-15%) but offer faster processing (3-7 days), no-collateral options for select programs, and simpler documentation. Key factors to compare: (1) Interest rate \u2014 fixed vs floating, (2) Processing fee \u2014 can be 0-2%, (3) Collateral requirement and threshold, (4) Maximum loan amount, (5) Moratorium period, (6) Repayment tenure flexibility, (7) Prepayment/foreclosure charges, (8) Insurance bundling. Tip: Apply to both a bank and an NBFC simultaneously \u2014 use the bank loan as backup while the NBFC processes faster.",
         keywords: ["bank vs nbfc", "education loan comparison", "which education loan", "loan tips"],
         source: "Analysis based on RBI norms + lender public rate cards",
         sourceUrl: "https://rbi.org.in/",
@@ -194,8 +194,8 @@ exports.knowledgeBase = [
         id: "margdarshak-arch-overall",
         category: "Architecture",
         title: "Margdarshak AI - Platform Overview",
-        content: "Margdarshak AI is an agentic AI guide built for the Meta Hackathon to assist students with Higher Education & Loan Readiness. It bridges the gap between academic preparation and financial securing (specifically targeting Poonawala Fincorp's ₹40L Zero-Collateral and ₹1Cr loan options). Key features include: the Loan Readiness Score (LRS), the Admission Predictor (MLR model, Acharya et al. 2019, R²=0.82), a Career Navigator, a Parent-Persuasion Report, and an LLM-powered Copilot Chatbot that utilizes a local MiniLM vector search engine.",
-        keywords: ["margdarshak ai", "poonawala fincorp", "meta hackathon", "platform overview", "loan readiness score"],
+        content: "Margdarshak AI is an agentic AI guide built for the Meta Hackathon to assist students with Higher Education & Loan Readiness. It bridges the gap between academic preparation and financial securing (specifically targeting zero-collateral and flexible loan options). Key features include: the Loan Readiness Score (LRS), the Admission Predictor (MLR model, Acharya et al. 2019, R²=0.82), a Career Navigator, a Parent-Persuasion Report, and an LLM-powered Copilot Chatbot that utilizes a local MiniLM vector search engine.",
+        keywords: ["margdarshak ai", "education loans", "meta hackathon", "platform overview", "loan readiness score"],
         source: "Margdarshak System Architecture",
         sourceUrl: "internal://architecture",
         lastVerified: "2026-04"
@@ -234,7 +234,7 @@ exports.knowledgeBase = [
         id: "margdarshak-arch-lrs",
         category: "Architecture",
         title: "The Loan Readiness Score (LRS)",
-        content: "The LRS is the core financial metric of Margdarshak AI, scaling from 300 to 900 perfectly mimicking traditional CIBIL scores. It is algorithmically calculated using the student's Academic Pedigree (Target University Tier), Projected Post-Graduation Salary (via US Scorecard/NIRF Medians), and existing Collateral/Co-applicant status. A score above 720 instantly unlocks the 'Fast-Track Poonawala Application' for zero-collateral lending.",
+        content: "The LRS is the core financial metric of Margdarshak AI, scaling from 300 to 900 perfectly mimicking traditional CIBIL scores. It is algorithmically calculated using the student's Academic Pedigree (Target University Tier), Projected Post-Graduation Salary (via US Scorecard/NIRF Medians), and existing Collateral/Co-applicant status. A score above 720 instantly unlocks fast-track partner applications for zero-collateral lending.",
         keywords: ["lrs", "loan readiness score", "algorithm", "cibil", "fast-track", "zero-collateral"],
         source: "Margdarshak System Architecture",
         sourceUrl: "internal://architecture",

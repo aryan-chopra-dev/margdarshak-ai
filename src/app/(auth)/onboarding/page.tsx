@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import {
@@ -25,6 +25,17 @@ function validateStep(step: number, form: Record<string, unknown>): Errors {
       errs.name = 'Name is required (at least 2 characters)';
     if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email as string))
       errs.email = 'Please enter a valid email address';
+    
+    const phone = (form.phone as string || '').trim();
+    if (!phone) {
+      errs.phone = 'Phone number is required';
+    } else {
+      const cleanPhone = phone.replace(/[\s\-\+]/g, '');
+      const last10 = cleanPhone.slice(-10);
+      if (last10.length !== 10 || !/^[6-9]\d{9}$/.test(last10)) {
+        errs.phone = 'Please enter a valid 10-digit Indian phone number';
+      }
+    }
   }
   if (step === 1) {
     if (!form.targetCountry)
@@ -66,7 +77,9 @@ function validateStep(step: number, form: Record<string, unknown>): Errors {
 
     if (form.parentPhone) {
       const phone = form.parentPhone as string;
-      if (!/^[6-9]\d{9}$/.test(phone)) {
+      const cleanPhone = phone.replace(/[\s\-\+]/g, '');
+      const last10 = cleanPhone.slice(-10);
+      if (last10.length !== 10 || !/^[6-9]\d{9}$/.test(last10)) {
         errs.parentPhone = 'Enter a valid 10-digit Indian phone number';
       }
     }
@@ -89,6 +102,7 @@ export default function OnboardingPage() {
   });
 
   const [mounted, setMounted] = useState(false);
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
     setMounted(true);
@@ -97,19 +111,28 @@ export default function OnboardingPage() {
       return;
     }
     
+    if (isInitializedRef.current) return;
+
     // Restore from draft if available, otherwise initialize from auth profile
     if (onboardingDraft?.form) {
       setStep(onboardingDraft.step);
-      setForm(onboardingDraft.form as typeof form);
-    } else {
+      setForm({
+        ...(onboardingDraft.form as typeof form),
+        name: profile?.name || (onboardingDraft.form as any).name || '',
+        email: profile?.email || (onboardingDraft.form as any).email || '',
+        phone: profile?.phone || (onboardingDraft.form as any).phone || '',
+      });
+      isInitializedRef.current = true;
+    } else if (profile?.email) {
       setForm(f => ({ 
         ...f, 
         name: profile?.name || f.name, 
         email: profile?.email || f.email ,
         phone: profile?.phone || f.phone ,
       }));
+      isInitializedRef.current = true;
     }
-  }, [isOnboarded, onboardingDraft, profile?.name, profile?.email, router]);
+  }, [isOnboarded, onboardingDraft, profile?.name, profile?.email, profile?.phone, router]);
 
   // Auto-save progress whenever step or form changes
   useEffect(() => {
@@ -195,8 +218,8 @@ export default function OnboardingPage() {
             <input className={`input-field ${errors.email ? 'error' : ''}`} type="email" placeholder="you@example.com"
               value={form.email} onChange={e => update('email', e.target.value)} />
           </Field>
-          <Field label="Phone Number">
-            <input className="input-field" type="tel" placeholder="+91 98765 43210"
+          <Field label="Phone Number *" error={errors.phone}>
+            <input className={`input-field ${errors.phone ? 'error' : ''}`} type="tel" placeholder="+91 98765 43210"
               value={form.phone} onChange={e => update('phone', e.target.value)} />
           </Field>
         </div>

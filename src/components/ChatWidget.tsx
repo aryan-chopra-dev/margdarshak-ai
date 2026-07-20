@@ -44,8 +44,8 @@ function generateResponse(query: string, profile: any): { response: string, step
       response += `• Median Earnings: ₹${Math.round(uni.medianEarnings10yr * USD_TO_INR).toLocaleString()} (10yr)\n\n`;
     });
     
-    steps.push("Router: Adding Poonawala Fincorp loan context...");
-    response += `---\n**Loan Guidance (Poonawala Fincorp)**\nWith your academic profile, you are eligible for up to ₹1 Crore at an 11.25% p.a. starting rate. For ${recommendations[0]?.name || 'these institutions'}, zero-collateral options up to ₹40L are available.`;
+    steps.push("Router: Adding education loan context...");
+    response += `---\n**Loan Guidance**\nWith your academic profile, you are eligible for zero-collateral education loans up to ₹40L - ₹1 Crore at attractive interest rates from leading lenders.`;
   } 
   // Intent 2: General RAG Query → hits the real vector-search API + Groq
   else {
@@ -156,7 +156,7 @@ export default function ChatWidget() {
   };
 
   const quickQuestions = [
-    'What is Poonawala\'s education loan rate?',
+    'What are the education loan options?',
     'US F-1 visa requirements?',
     'GRE score needed for top CS programs?',
     'How to convince parents for study abroad?',

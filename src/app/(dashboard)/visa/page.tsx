@@ -40,17 +40,17 @@ const visaData = {
       { doc: 'Passport-size photograph (US specs)', required: true },
       { doc: 'Proof of financial support (1st year costs)', required: true },
       { doc: 'Academic transcripts and test scores', required: true },
-      { doc: 'Poonawala Fincorp Sanction Letter', required: true, isBankDoc: true },
+      { doc: 'Education Loan Sanction Letter', required: true, isBankDoc: true },
       { doc: 'University acceptance letter', required: true },
       { doc: 'Visa interview appointment confirmation', required: true },
     ],
     tips: [
       'Book your DS-160 + interview slot as soon as you receive your I-20 — slots fill 4–6 weeks out',
-      'The Poonawala sanction letter directly counts as proof of financial support at the embassy',
+      'The loan sanction letter directly counts as proof of financial support at the embassy',
       'STEM OPT extension (36 months total) requires employer sponsorship — plan early',
       'Bring original documents + 2 complete sets of photocopies to the interview',
     ],
-    loanBenefit: 'The Poonawala Fincorp sanction letter is accepted by the US Embassy as Proof of Funds, eliminating the need to show a large balance in your bank account.',
+    loanBenefit: 'The education loan sanction letter is accepted by the US Embassy as Proof of Funds, eliminating the need to show a large balance in your bank account.',
   },
   'United Kingdom': {
     flag: '🇬🇧',
@@ -74,7 +74,7 @@ const visaData = {
       { doc: 'IELTS Academic (6.0–7.0 depending on university)', required: true },
       { doc: 'Tuberculosis test certificate (mandatory for Indians)', required: true },
       // Sanction letter replaces bank statement — accepted by UKVI as proof of funds
-      { doc: 'Poonawala Fincorp Sanction Letter (Proof of Funds)', required: true, isBankDoc: true },
+      { doc: 'Education Loan Sanction Letter (Proof of Funds)', required: true, isBankDoc: true },
       { doc: 'Parental consent letter (if under 18)', required: false },
     ],
     tips: [
@@ -83,7 +83,7 @@ const visaData = {
       'Apply online through the UKVI portal; biometrics are collected at a Visa Application Centre (VFS Global)',
       'IHS (£776/yr) covers full NHS services — you do NOT need separate health insurance for the UK',
     ],
-    loanBenefit: 'UK UKVI accepts a sanctioned education loan letter as proof of funds for tuition + maintenance costs (£1,023–£1,334/month). The Poonawala sanction letter covers this requirement directly.',
+    loanBenefit: 'UK UKVI accepts a sanctioned education loan letter as proof of funds for tuition + maintenance costs (£1,023–£1,334/month). The education loan sanction letter covers this requirement directly.',
   },
   'Canada': {
     flag: '🇨🇦',
@@ -108,7 +108,7 @@ const visaData = {
       { doc: 'IELTS 6.0+ (for SDS fast-track 20-day processing)', required: false },
       { doc: 'Medical exam (if required by IRCC)', required: false },
       // Sanction letter supplements the GIC but does NOT replace it
-      { doc: 'Poonawala Fincorp Sanction Letter (supplementary)', required: false, isBankDoc: true },
+      { doc: 'Education Loan Sanction Letter (supplementary)', required: false, isBankDoc: true },
       { doc: 'Biometrics enrollment', required: true },
     ],
     tips: [
@@ -117,7 +117,7 @@ const visaData = {
       'Apply online via IRCC; biometrics must be given in person at a VAC in India',
       'Quebec has separate immigration rules — check Arrima portal if studying at a Quebec university',
     ],
-    loanBenefit: 'Canada requires a GIC (₹12.6L locked in a Canadian bank account) for SDS. Your Poonawala loan can fund the GIC via disbursement — ask for a direct transfer to your GIC provider.',
+    loanBenefit: 'Canada requires a GIC (₹12.6L locked in a Canadian bank account) for SDS. Your education loan can fund the GIC via disbursement — ask for a direct transfer to your GIC provider.',
   },
   'Germany': {
     flag: '🇩🇪',
@@ -140,16 +140,16 @@ const visaData = {
       { doc: 'Academic qualification documents (verified by uni-assist)', required: true },
       { doc: 'Passport (valid for 6+ months)', required: true },
       { doc: 'Language proficiency (German B2 or English B2)', required: true },
-      { doc: 'Poonawala Fincorp Sanction Letter (supplementary)', required: false, isBankDoc: true },
+      { doc: 'Education Loan Sanction Letter (supplementary)', required: false, isBankDoc: true },
       { doc: 'Curriculum Vitae', required: true },
     ],
     tips: [
       'Germany requires a Blocked Account (Sperrkonto) — open one with Fintiba or Expatrio early (takes 2–4 weeks to fund)',
       'Most public German universities charge ZERO tuition — your loan mainly covers the Sperrkonto + living costs',
       'After graduation, you get 18 months to find a job — the best post-study job-seeking visa in Europe',
-      'Poonawala can disburse directly to your Sperrkonto provider — confirm this at sanction stage',
+      'Your lender can disburse directly to your Sperrkonto provider — confirm this at sanction stage',
     ],
-    loanBenefit: 'Germany requires a blocked account, not just a sanction letter. The Poonawala loan can be disbursed directly to fund your Sperrkonto.',
+    loanBenefit: 'Germany requires a blocked account, not just a sanction letter. The education loan can be disbursed directly to fund your Sperrkonto.',
   },
   'Australia': {
     flag: '🇦🇺',
@@ -171,7 +171,7 @@ const visaData = {
       { doc: 'Financial capacity — ₹13,40,000/year + tuition', required: true },
       { doc: 'OSHC (Overseas Student Health Cover)', required: true },
       { doc: 'Valid passport', required: true },
-      { doc: 'Poonawala Fincorp Sanction Letter', required: true, isBankDoc: true },
+      { doc: 'Education Loan Sanction Letter', required: true, isBankDoc: true },
     ],
     tips: [
       'GTE (Genuine Temporary Entrant) is crucial — clearly explain why you plan to return after studies',
@@ -179,7 +179,7 @@ const visaData = {
       'Australia\'s Subclass 485 post-study work visa is one of the most generous in the world',
       'You can work 48 hours per fortnight (2 weeks) during study — factor this into your financial planning',
     ],
-    loanBenefit: 'Australia requires proof of sufficient funds for first-year tuition + ₹13.4L living costs. A Poonawala sanction letter covering this is accepted.',
+    loanBenefit: 'Australia requires proof of sufficient funds for first-year tuition + ₹13.4L living costs. An education loan sanction letter covering this is accepted.',
   },
 };
 
@@ -202,7 +202,7 @@ export default function VisaAssistancePage() {
       <div className="section-label"><Plane size={14} /> Visa Assistance Centre</div>
       <h1 className="page-title">Student Visa Guide</h1>
       <p className="page-subtitle" style={{ marginBottom: 32 }}>
-        Country-specific visa requirements, document checklists, processing timelines, and how your Poonawala loan sanction letter helps at the embassy.
+        Country-specific visa requirements, document checklists, processing timelines, and how your education loan sanction letter helps at the embassy.
       </p>
 
       {/* Country Selector */}
@@ -341,7 +341,7 @@ export default function VisaAssistancePage() {
               </div>
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 12 }}>
-              * Visa costs are covered under your Poonawala Fincorp education loan (miscellaneous expenses clause).
+              * Visa costs are covered under your education loan (miscellaneous expenses clause).
             </p>
           </div>
 
@@ -405,7 +405,7 @@ export default function VisaAssistancePage() {
               <div style={{ width: 32, height: 32, borderRadius: 8, background: `${visa.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Shield size={16} color={visa.color} />
               </div>
-              <h4 style={{ fontSize: 13, fontWeight: 700 }}>How Your Poonawala Loan Helps</h4>
+              <h4 style={{ fontSize: 13, fontWeight: 700 }}>How Your Education Loan Helps</h4>
             </div>
             <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 12 }}>
               {visa.loanBenefit}
@@ -437,7 +437,7 @@ export default function VisaAssistancePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
                 { phase: 'Get Admission', time: 'Month 1', desc: 'Receive offer letter / I-20 / CAS from university' },
-                { phase: 'Apply Loan', time: 'Month 1–2', desc: 'Poonawala sanction in 3–5 days — use letter for embassy' },
+                { phase: 'Apply Loan', time: 'Month 1–2', desc: 'Loan approval in 3–7 days — use sanction letter for embassy' },
                 { phase: 'Gather Docs', time: 'Month 2', desc: 'TB test (UK), GIC (Canada), Sperrkonto (Germany), OSHC (AU)' },
                 {
                   phase: 'Visa Application', time:

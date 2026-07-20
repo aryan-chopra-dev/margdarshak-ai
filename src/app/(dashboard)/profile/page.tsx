@@ -77,6 +77,43 @@ export default function ProfilePage() {
   );
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
+  const [requestingAdmin, setRequestingAdmin] = useState(false);
+
+  const handleRequestAdmin = async () => {
+    setRequestingAdmin(true);
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          role: 'admin',
+          roleStatus: 'pending'
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const isDev = process.env.NODE_ENV === 'development';
+        setProfile({
+          role: 'admin',
+          roleStatus: isDev ? 'approved' : 'pending'
+        });
+        if (isDev) {
+          alert('Admin access granted and approved automatically (development bypass).');
+        } else {
+          alert('Admin access request submitted to admin queue.');
+        }
+      } else {
+        alert(data.message || 'Request failed');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Request error');
+    } finally {
+      setRequestingAdmin(false);
+    }
+  };
+
   // ---- Validation on blur ----
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -122,6 +159,20 @@ export default function ProfilePage() {
     }
     if (!formData.name.trim()) errors.name = 'Name is required';
     if (!formData.email.trim()) errors.email = 'Email is required';
+    if (formData.phone) {
+      const cleanPhone = formData.phone.replace(/[\s\-\+]/g, '');
+      const last10 = cleanPhone.slice(-10);
+      if (last10.length !== 10 || !/^[6-9]\d{9}$/.test(last10)) {
+        errors.phone = 'Please enter a valid 10-digit Indian phone number';
+      }
+    }
+    if (formData.parentPhone) {
+      const cleanPhone = formData.parentPhone.replace(/[\s\-\+]/g, '');
+      const last10 = cleanPhone.slice(-10);
+      if (last10.length !== 10 || !/^[6-9]\d{9}$/.test(last10)) {
+        errors.parentPhone = 'Please enter a valid 10-digit Indian phone number';
+      }
+    }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -250,7 +301,8 @@ export default function ProfilePage() {
             </div>
             <div>
               <label className="input-label">Phone Number</label>
-              <input name="phone" className="input-field" value={formData.phone} onChange={handleChange} />
+              <input name="phone" className={`input-field ${fieldErrors.phone ? 'error' : ''}`} value={formData.phone} onChange={handleChange} />
+              <FieldError field="phone" />
             </div>
             <div>
               <label className="input-label">Current Stage</label>
@@ -259,6 +311,33 @@ export default function ProfilePage() {
                 <option value="planner">The Planner (Preparing Tests/Docs)</option>
                 <option value="converter">The Converter (Applying/Admitted)</option>
               </select>
+            </div>
+            <div style={{ gridColumn: 'span 2', marginTop: 12, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+              <label className="input-label" style={{ marginBottom: 8 }}>Access Level</label>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-elevated)', padding: '12px 16px', borderRadius: 8 }}>
+                <div>
+                  <span style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    Current Role: {profile.role || 'user'}
+                  </span>
+                  {profile.role === 'admin' && profile.roleStatus === 'pending' && (
+                    <span className="tag tag-warning" style={{ marginLeft: 10 }}>Pending Approval</span>
+                  )}
+                  {profile.role === 'admin' && profile.roleStatus === 'approved' && (
+                    <span className="tag tag-success" style={{ marginLeft: 10 }}>Approved</span>
+                  )}
+                </div>
+                {(!profile.role || profile.role === 'user') && (
+                  <button
+                    type="button"
+                    onClick={handleRequestAdmin}
+                    disabled={requestingAdmin}
+                    className="btn btn-secondary"
+                    style={{ padding: '6px 14px', fontSize: 12 }}
+                  >
+                    {requestingAdmin ? 'Submitting...' : 'Request Admin Access'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -339,7 +418,8 @@ export default function ProfilePage() {
             </div>
             <div>
               <label className="input-label">Parent Phone</label>
-              <input name="parentPhone" type="tel" className="input-field" value={formData.parentPhone} onChange={handleChange} placeholder="+91 98765 43210" />
+              <input name="parentPhone" type="tel" className={`input-field ${fieldErrors.parentPhone ? 'error' : ''}`} value={formData.parentPhone} onChange={handleChange} placeholder="+91 98765 43210" />
+              <FieldError field="parentPhone" />
             </div>
             <div>
               <label className="input-label">
@@ -472,10 +552,44 @@ export default function ProfilePage() {
               );
             })}
           </div>
-          {/* Upload count badge */}
-          <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>
-            {Object.keys(uploadedDocs).length} of {DOCUMENT_TYPES.length} documents uploaded
-          </div>
+          {/* Upload progress bar */}
+          {(() => {
+            const uploadedCount = Object.keys(uploadedDocs).length;
+            const total = DOCUMENT_TYPES.length;
+            const pct = Math.round((uploadedCount / total) * 100);
+            const allDone = uploadedCount === total;
+            return (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: allDone ? 'var(--success)' : 'var(--text-secondary)' }}>
+                    {uploadedCount} of {total} documents uploaded
+                  </span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: allDone ? 'var(--success)' : 'var(--primary)' }}>
+                    {pct}%
+                  </span>
+                </div>
+                <div style={{ height: 6, borderRadius: 99, background: 'var(--bg-subtle)', overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${pct}%`,
+                    background: allDone ? 'var(--success)' : 'var(--primary)',
+                    borderRadius: 99,
+                    transition: 'width 0.4s ease',
+                  }} />
+                </div>
+                {!allDone && (
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.5 }}>
+                    ⚠️ Upload all {total} documents to unlock loan applications.
+                  </p>
+                )}
+                {allDone && (
+                  <p style={{ fontSize: 11, color: 'var(--success)', marginTop: 8, fontWeight: 600 }}>
+                    ✓ All documents verified — you are eligible to apply for a loan.
+                  </p>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         {/* ── Error / Success Banners ── */}

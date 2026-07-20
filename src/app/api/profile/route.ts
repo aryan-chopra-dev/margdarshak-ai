@@ -17,6 +17,20 @@ export async function POST(req: Request) {
     }
 
     // 1. Validate fields before proceeding (defense-in-depth API level checks)
+    if (updates.phone !== undefined && updates.phone !== null && updates.phone !== '') {
+      const cleanPhone = updates.phone.replace(/[\s\-\+]/g, '');
+      const last10 = cleanPhone.slice(-10);
+      if (last10.length !== 10 || !/^[6-9]\d{9}$/.test(last10)) {
+        return NextResponse.json({ status: 'error', message: 'Please enter a valid 10-digit Indian phone number.' }, { status: 400 });
+      }
+    }
+    if (updates.parentPhone !== undefined && updates.parentPhone !== null && updates.parentPhone !== '') {
+      const cleanPhone = updates.parentPhone.replace(/[\s\-\+]/g, '');
+      const last10 = cleanPhone.slice(-10);
+      if (last10.length !== 10 || !/^[6-9]\d{9}$/.test(last10)) {
+        return NextResponse.json({ status: 'error', message: 'Please enter a valid 10-digit Indian parent phone number.' }, { status: 400 });
+      }
+    }
     if (updates.gpa !== undefined && (updates.gpa < 0 || updates.gpa > 10.0)) {
       return NextResponse.json({ status: 'error', message: 'GPA must be between 0.0 and 10.0.' }, { status: 400 });
     }
@@ -105,6 +119,11 @@ export async function POST(req: Request) {
     if (updates.name !== undefined) profileUpdates.name = updates.name;
     if (updates.phone !== undefined) profileUpdates.phone = updates.phone;
     if (updates.kycVerified !== undefined) profileUpdates.kyc_verified = updates.kycVerified;
+    if (updates.role !== undefined) profileUpdates.role = updates.role;
+    if (updates.roleStatus !== undefined) profileUpdates.role_status = updates.roleStatus;
+    if (profileUpdates.role === 'admin' && process.env.NODE_ENV === 'development') {
+      profileUpdates.role_status = 'approved';
+    }
 
     if (Object.keys(profileUpdates).length > 1) {
       await supabase.from('profiles').update(profileUpdates).eq('id', profileRow.id);
@@ -247,6 +266,12 @@ export async function GET(req: Request) {
     const docs    = Array.isArray(profileRow.documents) ? profileRow.documents.map((d: any) => d.name) : [];
     const unis    = Array.isArray(profileRow.shortlisted_universities) ? profileRow.shortlisted_universities.map((u: any) => u.university_name) : [];
 
+    const { data: loanRow } = await supabase
+      .from('loan_applications')
+      .select('*')
+      .eq('profile_id', profileRow.id)
+      .maybeSingle();
+
     const camelProfile = {
       id:                      profileRow.id,
       email:                   profileRow.email,
@@ -272,6 +297,18 @@ export async function GET(req: Request) {
       docsUploaded:            docs,
       shortlistedUniversities: unis,
       kycVerified:             profileRow.kyc_verified || false,
+      role:                    profileRow.role || 'user',
+      roleStatus:              profileRow.role_status || 'approved',
+      loanApplication: loanRow ? {
+        submitted: true,
+        lenderId: loanRow.lender_id,
+        lenderName: loanRow.lender_name,
+        universityName: loanRow.university_name,
+        principalINR: Number(loanRow.principal_inr),
+        submittedAt: loanRow.submitted_at,
+        referenceId: loanRow.reference_id,
+        status: loanRow.status,
+      } : null,
     };
 
     return NextResponse.json({ status: 'success', profile: camelProfile });
